@@ -1,0 +1,149 @@
+/* Jadval konteyneri */
+.vacation-table-container {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Sariq rang - Ta'tildagi xodimlar uchun */
+  .row-on-vacation {
+    background-color: #ffffff !important; /* Yumshoq sariq rang */
+    font-weight: bold;
+  }
+  
+  /* Loader konteyneri */
+  .loader-container {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  /* Jadval asosiy stili */
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .table-header {
+    display: flex; /* Flexbox orqali markazlash */
+    justify-content: center; /* Gorizontal markazlash */
+    align-items: center; /* Vertikal markazlash */
+    margin-bottom: 20px; /* Pastki bo'shliq */
+  }
+  
+  .table th {
+    background: #e9e9e9 !important;
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+    color: #272727;
+  }
+  
+  .table td {
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  /* Jadvaldagi hover effekti */
+  .table tr:hover {
+    background: #e9e9e9;
+    cursor: pointer;
+  }
+  
+  /* Bo'sh ma'lumotlar xabari */
+  .empty-message {
+    text-align: center;
+    font-size: 16px;
+    color: #a6a6a6;
+    margin-top: 20px;
+  }
+  .vacation-table-container {
+    padding: 20px;
+    max-width: 100%;
+    margin: auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table-header {
+    margin-bottom: 20px;
+  }
+  
+  .table-header h2 {
+    color: #1890ff;
+    font-size: 24px;
+    margin: 0;
+  }
+  
+  .employee-table {
+    margin-top: 20px;
+  }
+  
+  .employee-table .ant-table-thead > tr > th {
+    background-color: #f0f2f5;
+    font-weight: 600;
+    color: #1890ff;
+    border-bottom: 2px solid #1890ff;
+    text-align: center;
+  }
+  
+  .employee-table .ant-table-tbody > tr:hover {
+    background-color: #e6f7ff;
+  }
+  
+  .employee-table .ant-table-tbody > tr.row-on-vacation {
+    background-color: #ffe6e6; /* Ta'tilda bo'lgan xodimlar uchun och pushti fon */
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+  
+  .empty-message {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  /* Media Queries: Kichik ekranlar uchun (max-width: 768px) */
+  @media (max-width: 768px) {
+    .vacation-table-container {
+      margin: 10px;
+    }
+    .employee-table .ant-table-thead,
+    .employee-table .ant-table-tbody {
+      font-size: 14px;
+    }
+  }
+  
+  /* Media Queries: Juda kichik ekranlar uchun (max-width: 480px) */
+  @media (max-width: 480px) {
+    .employee-table .ant-table-thead,
+    .employee-table .ant-table-tbody {
+      display: block;
+      width: 100%;
+    }
+    .employee-table .ant-table-thead {
+      display: none; /* Sarlavha yashiriladi */
+    }
+    .employee-table .ant-table-tbody td {
+      display: block;
+      text-align: right;
+      padding-left: 50%;
+      position: relative;
+    }
+    .employee-table .ant-table-tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 0;
+      width: 50%;
+      padding-left: 10px;
+      font-weight: bold;
+    }
+  }

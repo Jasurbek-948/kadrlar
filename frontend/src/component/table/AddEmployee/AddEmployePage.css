@@ -1,0 +1,175 @@
+/* .add-employee-container {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 600px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  } */
+  
+  /* h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #555;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+   */
+  /* .form-actions {
+    display: flex;
+    justify-content: center; /* Tugmalarni yonma-yon joylashtirish */
+    /* margin-top: 20px;
+    gap: 20px; */
+   */
+  
+  /* .add-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  } */
+  
+  /* Xodim qo‘shish tugmasi */
+  /* .add-btn[type="submit"] {
+    background-color: #28a745;
+  } */
+  
+  /* .add-btn[type="submit"]:hover {
+    background-color: #218838;
+  } */
+  
+  /* Ortga qaytish tugmasi */
+  /* .add-btn[type="button"] {
+    background-color: #28a745;
+  } */
+  
+  /* .add-btn[type="button"]:hover {
+    background-color: #28a745;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .add-btn {
+    display: block;
+    width: 100%; /* Tugma butun kenglikni egallaydi */
+    /* margin-bottom: 10px; /* Tugmalar orasiga bo'sh joy qo'shish */
+    /* padding: 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; */
+   
+   */ */
+  
+  /* .add-btn:hover {
+    background-color: #d32f2f;
+  }
+  
+  .add-btn:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  } */
+  .step-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .step-container .ant-steps {
+    margin-bottom: 20px;
+  }
+  
+  .step-container .ant-steps-item-title {
+    font-size: 14px;
+  }
+  
+  .step-container .ant-steps-item-description {
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .step-container .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .step-container .ant-btn {
+    margin-right: 10px;
+  }
+  
+  .step-content {
+    padding: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .form-group input,
+  .form-group .ant-select,
+  .form-group .ant-picker {
+    width: 100%;
+    
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+  }
+  
+  .add-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-btn:hover {
+    background-color: #218838;
+  }
+  
+  .add-btn.active {
+    background-color: #218838;
+  }
+  
+  .form-actions {
+    margin-top: 20px;
+  }
+  /* Forma guruhini yonma-yon joylashtirish */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 200px; /* Minimal kenglik */
+}
+  

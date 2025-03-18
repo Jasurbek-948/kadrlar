@@ -1,0 +1,118 @@
+.table-container {
+  margin: 20px;
+  overflow-x: auto;
+  cursor: pointer;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th, .table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.table th {
+  background-color: #f4f4f4;
+}
+
+.edit-btn, .delete-btn {
+  background-color: #6200ea;
+  color: white;
+  padding: 8px;
+  border: none;
+  margin-right: 8px;
+}
+
+.delete-btn {
+  background-color: red;
+}
+
+.edit-btn:hover, .delete-btn:hover {
+  opacity: 0.8;
+}
+
+
+.table-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.add-employee-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-employee-btn:hover {
+  background-color: #218838;
+}
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px; /* Loader balandligini sozlang */
+}
+
+.fullscreen-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 1000;
+}
+.row-on-vacation {
+  background-color: #ffe6e6; /* Tatilda bo'lgan xodimlar uchun och pushti fon */
+}
+
+.row-default {
+  background-color: white; /* Oddiy qatorlar */
+}
+
+/* Media Queries: Kichik ekranlar uchun (max-width: 768px) */
+@media (max-width: 768px) {
+  .table-container {
+      margin: 10px;
+  }
+  .table th, .table td {
+      font-size: 14px;
+      padding: 10px;
+  }
+  .edit-btn, .delete-btn {
+      padding: 6px;
+      font-size: 12px;
+  }
+}
+
+/* Media Queries: Juda kichik ekranlar uchun (max-width: 480px) */
+@media (max-width: 480px) {
+  .table th, .table td {
+      display: block;
+      width: 100%;
+      text-align: left;
+  }
+  .table th {
+      display: none; /* Sarlavha yashiriladi */
+  }
+  .table td::before {
+      content: attr(data-label); /* `data-label` atributidan foydalaniladi */
+      font-weight: bold;
+      display: block;
+  }
+  .edit-btn, .delete-btn {
+      margin-top: 8px; /* Tugmalar orasida bo'sh joy qo'shish */
+  }
+}

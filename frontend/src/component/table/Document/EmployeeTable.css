@@ -1,0 +1,50 @@
+.employee-container {
+  padding: 20px;
+  max-width: 100%;
+  margin: auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.employee-table {
+  margin-top: 20px;
+}
+
+.employee-table .ant-table-thead > tr > th {
+  background-color: #f0f2f5;
+  font-weight: 600;
+  color: #1890ff;
+  border-bottom: 2px solid #1890ff;
+}
+
+.employee-table .ant-table-tbody > tr:hover {
+  background-color: #e6f7ff;
+}
+
+.add-doc-btn {
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.add-doc-btn:hover {
+  background-color: #40a9ff;
+}
+
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+.ant-modal-header {
+  background-color: #f0f2f5;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.ant-modal-title {
+  color: #1890ff;
+  font-weight: 500;
+}

@@ -1,0 +1,321 @@
+.table-container {
+    margin-top: 20px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th,
+  .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    cursor: pointer; /* Qatorni bosish uchun ko‘rsatkichni o'zgartirish */
+  }
+  
+  .table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .details-row {
+    background-color: #f9f9f9;
+  }
+  
+  .details-content {
+    padding: 10px;
+    font-size: 14px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .action-btn {
+    padding: 5px 10px;
+    margin: 0 5px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .edit-btn {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .edit-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .delete-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background-color: #a71d2a;
+  }
+  /* Umumiy konteyner */
+.detail-container {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 600px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Sarlavha */
+  .detail-heading {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  /* Ma'lumotlar */
+  .detail-content p {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #555;
+  }
+  
+  .detail-content p strong {
+    color: #000;
+  }
+  
+  /* Tugma */
+  .detail-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .detail-button:hover {
+    background-color: #0056b3;
+  }
+  .detail-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 8px;
+    background: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .detail-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .section h3 {
+    color: #555;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .section p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .section p strong {
+    color: #333;
+  }
+  
+  .back-btn {
+    display: inline-block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: white;
+    background: #007bff;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .back-btn:hover {
+    background: #0056b3;
+  }
+  .detail-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .detail-container h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .section {
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .section h3 {
+    font-size: 20px;
+    color: #34495e;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+  }
+  
+  .section p {
+    margin: 8px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #2c3e50;
+  }
+  
+  .section p strong {
+    color: #2980b9;
+  }
+  
+  .back-btn {
+    display: inline-block;
+    margin: 20px auto;
+    padding: 10px 25px;
+    font-size: 16px;
+    color: white;
+    background-color: #3498db;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #2980b9;
+  }
+  .detail-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .detail-container h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 26px;
+    font-weight: bold;
+  }
+  
+  .info-card {
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .info-card h3 {
+    font-size: 20px;
+    color: #34495e;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+  }
+  
+  .info-card p {
+    margin: 8px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #2c3e50;
+  }
+  
+  .info-card p strong {
+    color: #2980b9;
+  }
+  
+  .back-btn {
+    display: block;
+    margin: 30px auto;
+    padding: 10px 25px;
+    font-size: 16px;
+    color: white;
+    background-color: #3498db;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #2980b9;
+  }
+  .action-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .action-buttons button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .edit-btn {
+    background-color: #00b7ffcb;
+    color: white;
+    transition: 0.3s;
+  }
+  
+  .edit-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .action-buttons button:hover {
+    opacity: 0.9;
+  }

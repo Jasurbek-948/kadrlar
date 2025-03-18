@@ -1,0 +1,123 @@
+.employee-details-modal {
+    padding: 10px;
+  }
+  
+  .employee-details-modal .ant-descriptions-item-label {
+    background-color: #f5f5f5;
+    font-weight: 500;
+    width: 200px; /* Label kengligi */
+  }
+  
+  .employee-details-modal .ant-descriptions-item-content {
+    background-color: #ffffff;
+  }
+  
+  .employee-details-modal .ant-divider {
+    margin: 20px 0;
+  }
+  
+  .employee-details-modal .ant-divider-horizontal.ant-divider-with-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .employee-details-modal .ant-descriptions-bordered .ant-descriptions-view {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .employee-details-modal .ant-descriptions-item-label,
+  .employee-details-modal .ant-descriptions-item-content {
+    padding: 8px 12px;
+  }
+  .archive-container {
+    padding: 20px;
+    max-width: 100%;
+    margin: auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table-header {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .employee-table {
+    margin-top: 20px;
+  }
+  
+  .employee-table .ant-table-thead > tr > th {
+    background-color: #f0f2f5;
+    font-weight: 600;
+    color: #1890ff;
+    border-bottom: 2px solid #1890ff;
+    text-align: center;
+  }
+  
+  .employee-table .ant-table-tbody > tr:hover {
+    background-color: #e6f7ff;
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+  
+  .empty-message {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 16px;
+  }
+  
+  /* Modal styling (qo'shimcha yaxshilash uchun) */
+  .employee-details-modal .ant-descriptions-item-label {
+    font-weight: 500;
+    background-color: #fafafa;
+  }
+  
+  .employee-details-modal .ant-descriptions-item-content {
+    background-color: #ffffff;
+  }
+  
+  /* Media Queries: Kichik ekranlar uchun (max-width: 768px) */
+  @media (max-width: 768px) {
+    .archive-container {
+      margin: 10px;
+    }
+    .employee-table .ant-table-thead,
+    .employee-table .ant-table-tbody {
+      font-size: 14px;
+    }
+  }
+  
+  /* Media Queries: Juda kichik ekranlar uchun (max-width: 480px) */
+  @media (max-width: 480px) {
+    .employee-table .ant-table-thead,
+    .employee-table .ant-table-tbody {
+      display: block;
+      width: 100%;
+    }
+    .employee-table .ant-table-thead {
+      display: none; /* Sarlavha yashiriladi */
+    }
+    .employee-table .ant-table-tbody td {
+      display: block;
+      text-align: right;
+      padding-left: 50%;
+      position: relative;
+    }
+    .employee-table .ant-table-tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 0;
+      width: 50%;
+      padding-left: 10px;
+      font-weight: bold;
+    }
+  }

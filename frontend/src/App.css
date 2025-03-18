@@ -1,0 +1,55 @@
+/* Umumiy ilova konteyneri */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  width: 100%;
+  background-color: #f5f5f5;
+  color: rgb(71, 48, 48);
+  padding: 20px;
+  text-align: center;
+  box-sizing: border-box;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Kontent qismi (Sidebar va Asosiy Kontent) */
+.content-container {
+  display: flex;
+  flex-grow: 1;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.sidebar a:hover {
+  background-color: #575757;
+}
+
+/* Asosiy kontent */
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+}
