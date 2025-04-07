@@ -1,50 +1,31 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button, Table, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Modal, Button, Table } from "antd";
 import { ToastContainer, toast } from "react-toastify";
-import AddDocument from "./AddDocument";
 import "react-toastify/dist/ReactToastify.css";
-import "./EmployeeTable.css";
+import AddDocument from "./AddDocument";
+import { fetchEmployees } from "../../../redux/slices/employeeSlice";
+
 
 const EmployeeTable = () => {
-  const [employees, setEmployees] = useState([]);
+  const dispatch = useDispatch();
+  const { employees, status, error } = useSelector((state) => state.employees);
+  const { isDarkMode } = useSelector((state) => state.theme);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
 
-  const fetchEmployees = async () => {
-    const token = localStorage.getItem("token"); // Tokenni olish
-    if (!token) {
-      message.error("Tizimga kiring!");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://localhost:5000/api/employees", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Token qo'shildi
-        },
-      });
-      console.log("Server javobi statusi:", response.status); // Statusni log qilamiz
-      if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem("token");
-          message.error("Tizimga qayta kiring! Token yaroqsiz.");
-          return;
-        }
-        throw new Error(`Server xatosi: ${response.status} - ${response.statusText}`);
-      }
-      const data = await response.json();
-      console.log("Olingan xodimlar:", data); // Ma'lumotlarni log qilamiz
-      setEmployees(data);
-    } catch (error) {
-      console.error("Xodimlarni olishda xatolik:", error);
-      message.error(error.message || "Server bilan bog'lanishda xatolik yuz berdi!");
-    }
-  };
+  useEffect(() => {
+    dispatch(fetchEmployees());
+  }, [dispatch]);
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    if (status === "failed" && error) {
+      toast.error(`❌ Xatolik: ${error}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  }, [status, error]);
 
   const showModal = (employeeId) => {
     setSelectedEmployeeId(employeeId);
@@ -62,7 +43,7 @@ const EmployeeTable = () => {
       autoClose: 3000,
     });
     handleCancel();
-    fetchEmployees(); // Ma'lumotlarni yangilash uchun qayta chaqirish
+    dispatch(fetchEmployees()); // Ma'lumotlarni yangilash
   };
 
   const columns = [
@@ -90,7 +71,10 @@ const EmployeeTable = () => {
       title: "Hujjat Qo'shish",
       key: "action",
       render: (_, record) => (
-        <Button className="add-doc-btn" onClick={() => showModal(record._id)}>
+        <Button
+          onClick={() => showModal(record._id)}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded-md transition-colors"
+        >
           Hujjat Qo'shish
         </Button>
       ),
@@ -98,23 +82,37 @@ const EmployeeTable = () => {
   ];
 
   return (
-    <div className="employee-container">
+    <div
+      className={`p-6 rounded-lg shadow-md ${
+        isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+      }`}
+    >
       <ToastContainer />
-      <h2 style={{ color: "#1890ff", marginBottom: "20px" }}>Mavjud Xodimlar Ro'yxati</h2>
+      <h2 className="text-2xl font-semibold text-blue-500 mb-5">
+        Mavjud Xodimlar Ro'yxati
+      </h2>
       <Table
         columns={columns}
-        dataSource={employees}
+        dataSource={employees.filter((employee) => !employee.isArchived)} // Arxivlangan xodimlarni chiqarmaymiz
         rowKey="_id"
         pagination={{ pageSize: 10 }}
         bordered
-        className="employee-table"
+        loading={status === "loading"}
+        className={`${
+          isDarkMode ? "ant-table-dark" : ""
+        } rounded-lg overflow-hidden`}
       />
       <Modal
-        title={<span style={{ color: "#1890ff" }}>Hujjat Qo'shish</span>}
+        title={
+          <span className="text-lg font-semibold text-blue-500">
+            Hujjat Qo'shish
+          </span>
+        }
         open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
         width={500}
+        className={isDarkMode ? "ant-modal-dark" : ""}
       >
         {selectedEmployeeId && (
           <AddDocument

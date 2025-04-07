@@ -1,80 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Table, Spin, Empty, Button, Modal, DatePicker, message } from "antd";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "./VacationTable.css";
 import moment from "moment";
+import { fetchEmployees, updateVacationStatus } from "../../../redux/slices/employeeSlice";
+import {
+  setIsModalVisible,
+  setSelectedEmployee,
+  setVacationDates,
+} from "../../../redux/slices/vacationTableSlice";
 
 const { RangePicker } = DatePicker;
 
 const VacationTable = () => {
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [vacationDates, setVacationDates] = useState([null, null]); // Yangi holat qo'shildi
+  const dispatch = useDispatch();
+  const { employees, status: employeeStatus, error: employeeError } = useSelector(
+    (state) => state.employees
+  );
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isDarkMode } = useSelector((state) => state.theme);
+  const { isModalVisible, selectedEmployee, vacationDates } = useSelector(
+    (state) => state.vacationTable
+  );
 
-  // Tokenni olish uchun umumiy funksiya
-  const getToken = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("Tizimga kiring!", { position: "top-right", autoClose: 3000 });
-      return null;
-    }
-    return token;
-  };
-
-  // API'dan ma'lumotlarni olish
-  const fetchVacationData = async () => {
-    const token = getToken();
-    if (!token) return;
-
-    setLoading(true);
-    try {
-      const response = await fetch("http://localhost:5000/api/employees", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem("token");
-          toast.error("Tizimga qayta kiring! Token yaroqsiz.", { position: "top-right", autoClose: 3000 });
-          return;
-        }
-        throw new Error("Ma'lumotlarni olishda xatolik yuz berdi");
-      }
-
-      const data = await response.json();
-      const filteredEmployees = data.filter(
-        (employee) => employee.vacationStatus && employee.vacationStatus !== "none"
-      );
-      console.log("Olingan xodimlar:", filteredEmployees);
-      setEmployees(filteredEmployees);
-    } catch (error) {
-      console.error("Xatolik:", error);
-      toast.error(`❌ Xatolik: ${error.message}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredEmployees = employees.filter(
+    (employee) => employee.vacationStatus && employee.vacationStatus !== "none"
+  );
 
   useEffect(() => {
-    fetchVacationData();
-  }, []);
+    if (!isAuthenticated) {
+      toast.error("Tizimga kiring!", { position: "top-right", autoClose: 3000 });
+      return;
+    }
 
-  // Ta'til muddatlarini yangilash uchun modal
+    dispatch(fetchEmployees());
+  }, [dispatch, isAuthenticated]);
+
   const showModal = (employee) => {
-    setSelectedEmployee(employee);
-    setVacationDates([
-      employee.vacationStart ? moment(employee.vacationStart) : null,
-      employee.vacationEnd ? moment(employee.vacationEnd) : null,
-    ]);
-    setIsModalVisible(true);
+    dispatch(setSelectedEmployee(employee));
+    dispatch(
+      setVacationDates([
+        employee.vacationStart ? moment(employee.vacationStart) : null,
+        employee.vacationEnd ? moment(employee.vacationEnd) : null,
+      ])
+    );
+    dispatch(setIsModalVisible(true));
   };
 
   const handleUpdateVacation = async () => {
@@ -84,63 +55,42 @@ const VacationTable = () => {
     }
 
     const [startDate, endDate] = vacationDates;
-    const token = getToken();
-    if (!token) return;
-
-    try {
-      const response = await fetch(`http://localhost:5000/api/employees/${selectedEmployee._id}/vacation`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          vacationStatus: selectedEmployee.vacationStatus,
-          vacationStart: startDate.toISOString(),
-          vacationEnd: endDate.toISOString(),
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Serverda xatolik!");
-      }
-
-      const result = await response.json();
-      setEmployees((prevEmployees) =>
-        prevEmployees.map((employee) =>
-          employee._id === selectedEmployee._id
-            ? {
-                ...employee,
-                vacationStart: result.vacationStart,
-                vacationEnd: result.vacationEnd,
-              }
-            : employee
-        )
-      );
-      toast.success("✅ Ta'til muddati muvaffaqiyatli yangilandi!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      setIsModalVisible(false);
-      setSelectedEmployee(null);
-      setVacationDates([null, null]);
-    } catch (error) {
-      console.error("Xatolik:", error);
-      toast.error(`❌ Xatolik: ${error.message}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
+    if (!isAuthenticated) {
+      toast.error("Tizimga kiring!", { position: "top-right", autoClose: 3000 });
+      return;
     }
+
+    dispatch(
+      updateVacationStatus({
+        id: selectedEmployee._id,
+        vacationStatus: selectedEmployee.vacationStatus,
+        vacationStart: startDate.toISOString(),
+        vacationEnd: endDate.toISOString(),
+      })
+    ).then((result) => {
+      if (result.error) {
+        toast.error(`❌ Xatolik: ${result.payload}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.success("✅ Ta'til muddati muvaffaqiyatli yangilandi!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        dispatch(setIsModalVisible(false));
+        dispatch(setSelectedEmployee(null));
+        dispatch(setVacationDates([null, null]));
+      }
+    });
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
-    setSelectedEmployee(null);
-    setVacationDates([null, null]);
+    dispatch(setIsModalVisible(false));
+    dispatch(setSelectedEmployee(null));
+    dispatch(setVacationDates([null, null]));
   };
 
-  // Ant Design ustunlari
   const columns = [
     {
       title: "№",
@@ -194,7 +144,11 @@ const VacationTable = () => {
       title: "Harakatlar",
       key: "actions",
       render: (text, record) => (
-        <Button type="primary" onClick={() => showModal(record)}>
+        <Button
+          type="primary"
+          onClick={() => showModal(record)}
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+        >
           Muddatni o'zgartirish
         </Button>
       ),
@@ -203,48 +157,56 @@ const VacationTable = () => {
   ];
 
   return (
-    <div className="vacation-table-container">
+    <div
+      className={`p-6 rounded-lg shadow-md ${
+        isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+      }`}
+    >
       <ToastContainer />
-      <div className="table-header">
-        <h2 style={{ textAlign: "center" }}>Mexnat Ta'tiliga Chiqgan Xodimlar</h2>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-center">Mexnat Ta'tiliga Chiqgan Xodimlar</h2>
       </div>
-      {loading ? (
-        <div className="loading-container">
+      {employeeStatus === "loading" ? (
+        <div className="flex justify-center items-center min-h-[200px]">
           <Spin size="large" tip="Ma'lumotlar yuklanmoqda..." />
         </div>
-      ) : employees.length > 0 ? (
+      ) : employeeStatus === "failed" ? (
+        <p className="text-center text-red-500">{employeeError}</p>
+      ) : filteredEmployees.length > 0 ? (
         <Table
-          dataSource={employees}
+          dataSource={filteredEmployees}
           columns={columns}
           rowClassName={(record) =>
-            record.vacationStatus !== "none" ? "row-on-vacation" : ""
+            record.vacationStatus !== "none" ? "bg-blue-50" : ""
           }
           rowKey={(record) => record._id}
           pagination={{ pageSize: 10 }}
           scroll={{ x: 1200 }}
-          className="employee-table"
+          className={`${isDarkMode ? "ant-table-dark" : ""}`}
         />
       ) : (
-        <div className="empty-message">
+        <div className="flex justify-center items-center min-h-[200px]">
           <Empty description="Ta'tilda xodimlar mavjud emas" />
         </div>
       )}
       <Modal
-        title="Ta'til Muddatini O'zgartirish"
+        title={<span className="text-blue-500">Ta'til Muddatini O'zgartirish</span>}
         open={isModalVisible}
         onOk={handleUpdateVacation}
         onCancel={handleCancel}
         okText="Saqlash"
         cancelText="Bekor qilish"
+        okButtonProps={{ className: "bg-blue-500 hover:bg-blue-600" }}
+        cancelButtonProps={{ className: "bg-gray-300 hover:bg-gray-400" }}
       >
-        <p>{selectedEmployee?.passportData.fullName} uchun ta'til muddatini belgilang:</p>
+        <p>{selectedEmployee?.passportData?.fullName} uchun ta'til muddatini belgilang:</p>
         <RangePicker
           format="DD.MM.YYYY"
           value={vacationDates}
           onChange={(dates) => {
-            setVacationDates(dates || [null, null]);
+            dispatch(setVacationDates(dates || [null, null]));
           }}
-          style={{ width: "100%", marginBottom: 16 }}
+          className="w-full p-2 border rounded-md mb-4"
         />
       </Modal>
     </div>

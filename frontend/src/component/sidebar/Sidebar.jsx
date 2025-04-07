@@ -1,5 +1,4 @@
 import React from "react";
-import "./Sidebar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendar,
@@ -9,61 +8,148 @@ import {
   faTags,
   faUserFriends,
   faHeadset,
+  faSun,
+  faMoon,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation } from "react-router-dom";
-import { useTheme } from "../../context/ThemeContext"; // useTheme ni import qilamiz
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../../redux/slices/themeSlice";
 
 const Sidebar = () => {
   const location = useLocation();
-  const { isDarkMode, toggleTheme } = useTheme(); // ThemeContext o‘rniga useTheme ishlatamiz
+  const dispatch = useDispatch();
+  const { isDarkMode } = useSelector((state) => state.theme);
+
+  const handleToggleTheme = () => {
+    dispatch(toggleTheme());
+  };
 
   return (
-    <div className={`sidebar ${isDarkMode ? "dark" : "light"}`}>
+    <div
+      className={`w-64 h-screen p-4 shadow-lg transition-colors duration-300 ${isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+        }`}
+    >
       <nav className="menu">
-        <ul>
-          <li className={`menu-item ${location.pathname === "/" ? "active" : ""}`}>
-            <Link to="/">
-              <FontAwesomeIcon className="fontawesome" icon={faCalendar} />
+        <ul className="space-y-2">
+          <li
+            className={`rounded-md transition-colors duration-200 ${location.pathname === "/"
+              ? isDarkMode
+                ? "bg-gray-700 text-white"
+                : "bg-gray-200 text-gray-900"
+              : isDarkMode
+                ? "hover:bg-gray-700"
+                : "hover:bg-gray-200"
+              }`}
+          >
+            <Link to="/" className="flex items-center p-2">
+              <FontAwesomeIcon className="mr-3 text-lg" icon={faCalendar} />
               <span>Umumiy Jadval</span>
             </Link>
           </li>
-          <li className={`menu-item ${location.pathname === "/tatil" ? "active" : ""}`}>
-            <Link to="/tatil">
-              <FontAwesomeIcon className="fontawesome" icon={faGift} />
+          <li
+            className={`rounded-md transition-colors duration-200 ${location.pathname === "/tatil"
+              ? isDarkMode
+                ? "bg-gray-700 text-white"
+                : "bg-gray-200 text-gray-900"
+              : isDarkMode
+                ? "hover:bg-gray-700"
+                : "hover:bg-gray-200"
+              }`}
+          >
+            <Link to="/tatil" className="flex items-center p-2">
+              <FontAwesomeIcon className="mr-3 text-lg" icon={faGift} />
               <span>Mexnat ta'tili</span>
             </Link>
           </li>
-          <li className={`menu-item ${location.pathname === "/jazo" ? "active" : ""}`}>
-            <Link to="/jazo">
-              <FontAwesomeIcon className="fontawesome" icon={faMapMarkerAlt} />
+          <li
+            className={`rounded-md transition-colors duration-200 ${location.pathname === "/jazo"
+              ? isDarkMode
+                ? "bg-gray-700 text-white"
+                : "bg-gray-200 text-gray-900"
+              : isDarkMode
+                ? "hover:bg-gray-700"
+                : "hover:bg-gray-200"
+              }`}
+          >
+            <Link to="/jazo" className="flex items-center p-2">
+              <FontAwesomeIcon className="mr-3 text-lg" icon={faMapMarkerAlt} />
               <span>Intizomiy jazolar</span>
             </Link>
           </li>
-          <li className={`menu-item ${location.pathname === "/xujjat" ? "active" : ""}`}>
-            <Link to="/xujjat">
-              <FontAwesomeIcon className="fontawesome" icon={faCreditCard} />
+          <li
+            className={`rounded-md transition-colors duration-200 ${location.pathname === "/xujjat"
+              ? isDarkMode
+                ? "bg-gray-700 text-white"
+                : "bg-gray-200 text-gray-900"
+              : isDarkMode
+                ? "hover:bg-gray-700"
+                : "hover:bg-gray-200"
+              }`}
+          >
+            <Link to="/xujjat" className="flex items-center p-2">
+              <FontAwesomeIcon className="mr-3 text-lg" icon={faCreditCard} />
               <span>Qo'shimcha xujjatlar</span>
             </Link>
           </li>
-          <li className={`menu-item ${location.pathname === "/tabel" ? "active" : ""}`}>
-            <Link to="/tabel">
-              <FontAwesomeIcon className="fontawesome" icon={faTags} />
+          <li
+            className={`rounded-md transition-colors duration-200 ${location.pathname === "/tabel"
+              ? isDarkMode
+                ? "bg-gray-700 text-white"
+                : "bg-gray-200 text-gray-900"
+              : isDarkMode
+                ? "hover:bg-gray-700"
+                : "hover:bg-gray-200"
+              }`}
+          >
+            <Link to="/tabel" className="flex items-center p-2">
+              <FontAwesomeIcon className="mr-3 text-lg" icon={faTags} />
               <span>Tabel</span>
             </Link>
           </li>
-          <li className={`menu-item ${location.pathname === "/refer" ? "active" : ""}`}>
-            <Link to="/refer">
-              <FontAwesomeIcon className="fontawesome" icon={faUserFriends} />
+          <li
+            className={`rounded-md transition-colors duration-200 ${location.pathname === "/refer"
+              ? isDarkMode
+                ? "bg-gray-700 text-white"
+                : "bg-gray-200 text-gray-900"
+              : isDarkMode
+                ? "hover:bg-gray-700"
+                : "hover:bg-gray-200"
+              }`}
+          >
+            <Link to="/refer" className="flex items-center p-2">
+              <FontAwesomeIcon className="mr-3 text-lg" icon={faUserFriends} />
               <span>--------</span>
             </Link>
           </li>
-          <li className={`menu-item ${location.pathname === "/archive" ? "active" : ""}`}>
-            <Link to="/archive">
-              <FontAwesomeIcon className="fontawesome" icon={faHeadset} />
+          <li
+            className={`rounded-md transition-colors duration-200 ${location.pathname === "/archive"
+              ? isDarkMode
+                ? "bg-gray-700 text-white"
+                : "bg-gray-200 text-gray-900"
+              : isDarkMode
+                ? "hover:bg-gray-700"
+                : "hover:bg-gray-200"
+              }`}
+          >
+            <Link to="/archive" className="flex items-center p-2">
+              <FontAwesomeIcon className="mr-3 text-lg" icon={faHeadset} />
               <span>Arxiv</span>
             </Link>
           </li>
-         
+          {/* Tema o‘zgartirish tugmasi */}
+          <li className="mt-4">
+            <button
+              onClick={handleToggleTheme}
+              className={`flex items-center p-2 w-full rounded-md transition-colors duration-200 ${isDarkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"
+                }`}
+            >
+              <FontAwesomeIcon
+                className="mr-3 text-lg"
+                icon={isDarkMode ? faSun : faMoon}
+              />
+              <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+            </button>
+          </li>
         </ul>
       </nav>
     </div>

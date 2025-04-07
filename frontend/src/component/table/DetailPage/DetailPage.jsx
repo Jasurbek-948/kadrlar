@@ -1,83 +1,101 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Spin, message } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { Spin } from "antd";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import moment from "moment";
 import Files from "../Document/Files";
-import "./DetailPage.css";
+import { fetchEmployeeById, clearCurrentEmployee } from "../../../redux/slices/departmentSlice";
+// import { fetchEmployeeById, clearCurrentEmployee } from "../redux/slices/employeeSlice";
 
 const DetailPage = () => {
-  const { id } = useParams(); // trackingId o'rniga id ishlatamiz
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [employee, setEmployee] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { currentEmployee, fetchStatus, fetchError } = useSelector(
+    (state) => state.departments // state.employees o‘rniga state.departments
+  );
+  const { isDarkMode } = useSelector((state) => state.theme);
 
   useEffect(() => {
-    const fetchEmployee = async () => {
-      // ID ni tekshirish
-      if (!id || id === "undefined") {
-        message.error("Xodim ID si noto'g'ri yoki topilmadi!");
-        setLoading(false);
-        return;
-      }
-
-      const token = localStorage.getItem("token"); // Tokenni olish
-      if (!token) {
-        message.error("Tizimga kiring!");
-        navigate("/login");
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const response = await fetch(`http://localhost:5000/api/employees/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Token qo'shildi
-          },
-        });
-        console.log("Server javobi statusi:", response.status); // Statusni log qilamiz
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Server xatosi: ${response.status} - ${response.statusText}`);
-        }
-        const result = await response.json();
-        console.log("Olingan xodim ma'lumotlari:", result); // Ma'lumotlarni log qilamiz
-        setEmployee(result);
-      } catch (error) {
-        console.error("Server bilan bog'lanishda xatolik:", error);
-        message.error(error.message || "Server bilan bog'lanishda xatolik yuz berdi!");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmployee();
-  }, [id, navigate]);
-
-  const handleEdit = () => {
-    if (!employee?._id) {
-      message.error("Xodim ma'lumotlari topilmadi!");
+    if (!id || id === "undefined") {
+      toast.error("Xodim ID si noto'g'ri yoki topilmadi!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
-    navigate(`/edit/${employee._id}`); // Edit sahifasiga yo'naltirish
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Tizimga kiring!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      navigate("/login");
+      return;
+    }
+
+    dispatch(fetchEmployeeById(id));
+
+    return () => {
+      dispatch(clearCurrentEmployee());
+    };
+  }, [id, navigate, dispatch]);
+
+  useEffect(() => {
+    if (fetchStatus === "failed" && fetchError) {
+      toast.error(`❌ Xatolik: ${fetchError}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  }, [fetchStatus, fetchError]);
+
+  const handleEdit = () => {
+    if (!currentEmployee?._id) {
+      toast.error("Xodim ma'lumotlari topilmadi!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    navigate(`/edit/${currentEmployee._id}`);
   };
 
-  if (loading) {
+  if (fetchStatus === "loading") {
     return (
-      <div className="detail-container">
+      <div
+        className={`p-6 rounded-lg shadow-md flex flex-col items-center ${
+          isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+        }`}
+      >
         <Spin tip="Ma'lumotlar yuklanmoqda..." />
-        <button onClick={() => navigate("/")} className="back-btn">
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+        >
           Bosh sahifaga qaytish
         </button>
       </div>
     );
   }
 
-  if (!employee) {
+  if (!currentEmployee || !currentEmployee.passportData) {
     return (
-      <div className="detail-container">
-        <h2>Xodim ma'lumotlari topilmadi!</h2>
-        <button onClick={() => navigate("/")} className="back-btn">
+      <div
+        className={`p-6 rounded-lg shadow-md flex flex-col items-center ${
+          isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+        }`}
+      >
+        <h2 className="text-xl font-semibold text-red-500 mb-4">
+          Xodim ma'lumotlari topilmadi!
+        </h2>
+        <button
+          onClick={() => navigate("/")}
+          className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+        >
           Bosh sahifaga qaytish
         </button>
       </div>
@@ -85,79 +103,188 @@ const DetailPage = () => {
   }
 
   return (
-    <div className="detail-container">
-      <h2>{employee.passportData.fullName} haqida to'liq ma'lumot</h2>
+    <div
+      className={`p-6 rounded-lg shadow-md ${
+        isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+      }`}
+    >
+      <ToastContainer />
+      <h2 className="text-2xl font-semibold text-blue-500 mb-6">
+        {currentEmployee.passportData.fullName || "Noma'lum"} haqida to'liq ma'lumot
+      </h2>
 
       {/* Passport Ma'lumotlari */}
-      <section className="info-card">
-        <h3>Passport Ma'lumotlari</h3>
-        <p><strong>F.I.O:</strong> {employee.passportData.fullName || "Noma'lum"}</p>
-        <p><strong>Telefon:</strong> {employee.passportData.phoneNumber || "Noma'lum"}</p>
-        <p><strong>INN:</strong> {employee.passportData.inn || "Noma'lum"}</p>
-        <p><strong>INSP:</strong> {employee.passportData.insp || "Noma'lum"}</p>
-        <p><strong>Manzil:</strong> {employee.passportData.address || "Noma'lum"}</p>
-        <p><strong>Pasport Seriyasi:</strong> {employee.passportData.passportSeries || "Noma'lum"}</p>
-        <p><strong>Pasport Raqami:</strong> {employee.passportData.passportNumber || "Noma'lum"}</p>
-        <p><strong>Kim Tomonidan Berilgan:</strong> {employee.passportData.issuedBy || "Noma'lum"}</p>
-        <p>
-          <strong>Berilgan Sana:</strong>{" "}
-          {employee.passportData.issuedDate
-            ? moment(employee.passportData.issuedDate).format("DD.MM.YYYY")
-            : "Noma'lum"}
-        </p>
-        <p>
-          <strong>Tug'ilgan Sana:</strong>{" "}
-          {employee.passportData.birthDate
-            ? moment(employee.passportData.birthDate).format("DD.MM.YYYY")
-            : "Noma'lum"}
-        </p>
-        <p><strong>Jinsi:</strong> {employee.passportData.gender || "Noma'lum"}</p>
-        <p><strong>Tug'ilgan Joyi:</strong> {employee.passportData.birthPlace || "Noma'lum"}</p>
-        <p><strong>Millati:</strong> {employee.passportData.nationality || "Noma'lum"}</p>
+      <section
+        className={`p-4 rounded-md mb-4 ${
+          isDarkMode ? "bg-gray-700" : "bg-gray-100"
+        }`}
+      >
+        <h3 className="text-xl font-semibold text-blue-500 mb-3">
+          Passport Ma'lumotlari
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <p>
+            <strong>F.I.O:</strong>{" "}
+            {currentEmployee.passportData.fullName || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Telefon:</strong>{" "}
+            {currentEmployee.passportData.phoneNumber || "Noma'lum"}
+          </p>
+          <p>
+            <strong>INN:</strong>{" "}
+            {currentEmployee.passportData.inn || "Noma'lum"}
+          </p>
+          <p>
+            <strong>INSP:</strong>{" "}
+            {currentEmployee.passportData.insp || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Manzil:</strong>{" "}
+            {currentEmployee.passportData.address || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Pasport Seriyasi:</strong>{" "}
+            {currentEmployee.passportData.passportSeries || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Pasport Raqami:</strong>{" "}
+            {currentEmployee.passportData.passportNumber || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Kim Tomonidan Berilgan:</strong>{" "}
+            {currentEmployee.passportData.issuedBy || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Berilgan Sana:</strong>{" "}
+            {currentEmployee.passportData.issuedDate
+              ? moment(currentEmployee.passportData.issuedDate).format(
+                  "DD.MM.YYYY"
+                )
+              : "Noma'lum"}
+          </p>
+          <p>
+            <strong>Tug'ilgan Sana:</strong>{" "}
+            {currentEmployee.passportData.birthDate
+              ? moment(currentEmployee.passportData.birthDate).format(
+                  "DD.MM.YYYY"
+                )
+              : "Noma'lum"}
+          </p>
+          <p>
+            <strong>Jinsi:</strong>{" "}
+            {currentEmployee.passportData.gender || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Tug'ilgan Joyi:</strong>{" "}
+            {currentEmployee.passportData.birthPlace || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Millati:</strong>{" "}
+            {currentEmployee.passportData.nationality || "Noma'lum"}
+          </p>
+        </div>
       </section>
 
       {/* Ish Joyi Ma'lumotlari */}
-      <section className="info-card">
-        <h3>Ish Joyi Ma'lumotlari</h3>
-        <p><strong>Bo'lim:</strong> {employee.jobData.department || "Noma'lum"}</p>
-        <p><strong>Lavozimi:</strong> {employee.jobData.position || "Noma'lum"}</p>
-        <p><strong>Razryadi:</strong> {employee.jobData.grade || "Noma'lum"}</p>
-        <p><strong>Maoshi:</strong> {employee.jobData.salary || "Noma'lum"}</p>
-        <p><strong>Bandlik Yo'llanmasi:</strong> {employee.jobData.employmentContract || "Noma'lum"}</p>
-        <p>
-          <strong>Ishga Kirgan Vaqti:</strong>{" "}
-          {employee.jobData.hireDate
-            ? moment(employee.jobData.hireDate).format("DD.MM.YYYY")
-            : "Noma'lum"}
-        </p>
-        <p><strong>Buyruq Raqami:</strong> {employee.jobData.orderNumber || "Noma'lum"}</p>
-        <p><strong>Ish Tajribasi:</strong> {employee.jobData.experience || "Noma'lum"}</p>
+      <section
+        className={`p-4 rounded-md mb-4 ${
+          isDarkMode ? "bg-gray-700" : "bg-gray-100"
+        }`}
+      >
+        <h3 className="text-xl font-semibold text-blue-500 mb-3">
+          Ish Joyi Ma'lumotlari
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <p>
+            <strong>Bo'lim:</strong>{" "}
+            {currentEmployee.jobData?.department || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Lavozimi:</strong>{" "}
+            {currentEmployee.jobData?.position || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Razryadi:</strong>{" "}
+            {currentEmployee.jobData?.grade || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Maoshi:</strong>{" "}
+            {currentEmployee.jobData?.salary || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Bandlik Yo'llanmasi:</strong>{" "}
+            {currentEmployee.jobData?.employmentContract || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Ishga Kirgan Vaqti:</strong>{" "}
+            {currentEmployee.jobData?.hireDate
+              ? moment(currentEmployee.jobData.hireDate).format("DD.MM.YYYY")
+              : "Noma'lum"}
+          </p>
+          <p>
+            <strong>Buyruq Raqami:</strong>{" "}
+            {currentEmployee.jobData?.orderNumber || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Ish Tajribasi:</strong>{" "}
+            {currentEmployee.jobData?.experience || "Noma'lum"}
+          </p>
+        </div>
       </section>
 
       {/* Ma'lumoti */}
-      <section className="info-card">
-        <h3>Ma'lumoti</h3>
-        <p><strong>Ma'lumoti:</strong> {employee.educationData.educationLevel || "Noma'lum"}</p>
-        <p>
-          <strong>Qaysi O'quv Yurtini Tamomlagan:</strong>{" "}
-          {employee.educationData.institution || "Noma'lum"}
-        </p>
-        <p><strong>Mutaxassisligi:</strong> {employee.educationData.specialty || "Noma'lum"}</p>
-        <p><strong>Bitirgan Yili:</strong> {employee.educationData.graduationYear || "Noma'lum"}</p>
-        <p><strong>Diplom Raqami:</strong> {employee.educationData.diplomaNumber || "Noma'lum"}</p>
+      <section
+        className={`p-4 rounded-md mb-4 ${
+          isDarkMode ? "bg-gray-700" : "bg-gray-100"
+        }`}
+      >
+        <h3 className="text-xl font-semibold text-blue-500 mb-3">Ma'lumoti</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <p>
+            <strong>Ma'lumoti:</strong>{" "}
+            {currentEmployee.educationData?.educationLevel || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Qaysi O'quv Yurtini Tamomlagan:</strong>{" "}
+            {currentEmployee.educationData?.institution || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Mutaxassisligi:</strong>{" "}
+            {currentEmployee.educationData?.specialty || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Bitirgan Yili:</strong>{" "}
+            {currentEmployee.educationData?.graduationYear || "Noma'lum"}
+          </p>
+          <p>
+            <strong>Diplom Raqami:</strong>{" "}
+            {currentEmployee.educationData?.diplomaNumber || "Noma'lum"}
+          </p>
+        </div>
       </section>
 
       {/* Hujjatlar */}
-      <section className="info-card">
-        <h3>Hujjatlar</h3>
+      <section
+        className={`p-4 rounded-md mb-4 ${
+          isDarkMode ? "bg-gray-700" : "bg-gray-100"
+        }`}
+      >
+        <h3 className="text-xl font-semibold text-blue-500 mb-3">Hujjatlar</h3>
         <Files employeeId={id} />
       </section>
 
-      <button className="back-btn" onClick={() => navigate("/")}>
-        Bosh sahifaga qaytish
-      </button>
-      <div className="action-buttons">
-        <button onClick={handleEdit} className="edit-btn">
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={() => navigate("/")}
+          className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+        >
+          Bosh sahifaga qaytish
+        </button>
+        <button
+          onClick={handleEdit}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+        >
           Tahrirlash
         </button>
       </div>

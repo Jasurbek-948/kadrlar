@@ -4,7 +4,7 @@ const employeeSchema = new mongoose.Schema({
   passportData: {
     fullName: { type: String, required: true },
     inn: { type: String, required: true, match: /^\d{9}$/ },
-    insp: { type: String, required: true, match: /^\d{14}$/ },
+    insp: { type: String, required: true, unique: true, match: /^\d{14}$/ },
     address: { type: String, required: true },
     passportSeries: { type: String, required: true, match: /^[A-Z]{2}$/ },
     passportNumber: { type: String, required: true, match: /^\d{7}$/ },
@@ -84,5 +84,14 @@ employeeSchema.virtual("jobData.experience").get(function () {
 
 employeeSchema.set("toJSON", { virtuals: true });
 employeeSchema.set("toObject", { virtuals: true });
+
+// Dublikat INPS bo‘lsa xato qaytarish uchun middleware
+employeeSchema.post("save", function (error, doc, next) {
+  if (error.name === "MongoServerError" && error.code === 11000) {
+    next(new Error("Bu INPS bilan xodim allaqachon ro‘yxatdan o‘tgan!"));
+  } else {
+    next(error);
+  }
+});
 
 module.exports = mongoose.model("Employee", employeeSchema);

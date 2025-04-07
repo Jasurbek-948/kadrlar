@@ -1,195 +1,96 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { message, Modal, Button, Select, Table, Spin } from "antd";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "./DisciplinaryActions.css";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { EditOutlined, DeleteOutlined, FilePdfOutlined, FileExcelOutlined } from "@ant-design/icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchEmployees } from "../../../redux/slices/employeeSlice";
+import {
+  fetchDisciplinaryActions,
+  addDisciplinaryAction,
+  updateDisciplinaryAction,
+  deleteDisciplinaryAction,
+  setSelectedYear,
+} from "../../../redux/slices/disciplinarySlice";
+import {
+  setFormData,
+  resetFormData,
+  setIsModalOpen,
+  setEditData,
+} from "../../../redux/slices/disciplinaryFormSlice";
 
 const { Option } = Select;
 
 const DisciplinaryActions = () => {
-  const [actions, setActions] = useState([]);
-  const [filteredActions, setFilteredActions] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    employeeId: "",
-    fullName: "",
-    position: "",
-    orderDetails: "",
-    orderDate: "",
-    reason: "",
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false); // `isModalVisible` o‘rniga `isModalOpen`
-  const [editData, setEditData] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(null);
+  const dispatch = useDispatch();
+  const { employees } = useSelector((state) => state.employees);
+  const { actions, filteredActions, selectedYear, status: disciplinaryStatus, error: disciplinaryError } =
+    useSelector((state) => state.disciplinary);
+  const { formData, isModalOpen, editData } = useSelector(
+    (state) => state.disciplinaryForm
+  );
+  const { isDarkMode } = useSelector((state) => state.theme);
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // Tokenni olish uchun umumiy funksiya
-  const getToken = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  useEffect(() => {
+    if (!isAuthenticated) {
       toast.error("Tizimga kiring!", { position: "top-right", autoClose: 3000 });
-      return null;
-    }
-    return token;
-  };
-
-  // Xodimlar ro'yxatini olish
-  const fetchEmployees = async () => {
-    const token = getToken();
-    if (!token) return;
-
-    try {
-      const response = await fetch("http://localhost:5000/api/employees", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Xodimlar ro'yxatini olishda xatolik yuz berdi");
-      }
-      const data = await response.json();
-      console.log("Olingan xodimlar:", data);
-      setEmployees(data);
-    } catch (error) {
-      console.error("Xatolik:", error);
-      toast.error("Xatolik: " + error.message);
-    }
-  };
-
-  const fetchDisciplinaryData = async () => {
-    const token = getToken();
-    if (!token) return;
-  
-    setLoading(true);
-    try {
-      const response = await fetch("http://localhost:5000/api/disciplinary", { // "/all" ni olib tashladik
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("Server javobi statusi:", response.status);
-      const responseText = await response.text();
-      console.log("Server javobi texti:", responseText);
-  
-      if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem("token");
-          toast.error("Tizimga qayta kiring! Token yaroqsiz.", { position: "top-right", autoClose: 3000 });
-          return;
-        }
-        throw new Error(`Server xatosi: ${response.status} - ${responseText}`);
-      }
-  
-      let data;
-      try {
-        data = responseText ? JSON.parse(responseText) : [];
-      } catch (e) {
-        throw new Error("Serverdan kelgan javob JSON emas: " + responseText.substring(0, 100));
-      }
-      console.log("Olingan intizomiy jazolar:", data);
-      setActions(data);
-      setFilteredActions(data);
-    } catch (error) {
-      console.error("Xatolik:", error);
-      toast.error("Xatolik: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEmployees();
-    fetchDisciplinaryData();
-  }, []);
-
-  useEffect(() => {
-    if (!selectedYear) {
-      setFilteredActions(actions);
       return;
     }
 
-    const filtered = actions.filter((action) => {
-      const actionYear = new Date(action.orderDate).getFullYear();
-      return actionYear === selectedYear;
-    });
-    setFilteredActions(filtered);
-  }, [selectedYear, actions]);
+    dispatch(fetchEmployees());
+    dispatch(fetchDisciplinaryActions());
+  }, [dispatch, isAuthenticated]);
+
+  console.log("Tanlangan yil (selectedYear):", selectedYear);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "employeeId") {
-      const selectedEmployee = employees.find((emp) => emp._id === value);
-      if (selectedEmployee) {
-        setFormData({
-          ...formData,
-          employeeId: value,
-          fullName: selectedEmployee.passportData.fullName,
-          position: selectedEmployee.jobData.position,
-        });
-      }
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    dispatch(setFormData({ [name]: value }));
   };
 
   const handleSelectChange = (value) => {
     const selectedEmployee = employees.find((emp) => emp._id === value);
     if (selectedEmployee) {
-      setFormData({
-        ...formData,
-        employeeId: value,
-        fullName: selectedEmployee.passportData.fullName,
-        position: selectedEmployee.jobData.position,
-      });
+      dispatch(
+        setFormData({
+          employeeId: value,
+          fullName: selectedEmployee.passportData.fullName,
+          position: selectedEmployee.jobData.position,
+        })
+      );
     }
   };
 
   const handleEdit = (action) => {
-    setEditData(action);
-    setFormData({
-      employeeId: action.employeeId,
-      fullName: action.fullName,
-      position: action.position,
-      orderDetails: action.orderDetails,
-      orderDate: action.orderDate.split("T")[0],
-      reason: action.reason,
-    });
-    setIsModalOpen(true);
+    dispatch(setEditData(action));
+    dispatch(
+      setFormData({
+        employeeId: action.employeeId,
+        fullName: action.fullName,
+        position: action.position,
+        orderDetails: action.orderDetails,
+        orderDate: action.orderDate ? action.orderDate.split("T")[0] : "",
+        reason: action.reason,
+      })
+    );
+    dispatch(setIsModalOpen(true));
   };
 
-  const handleDelete = async (id) => {
-    const token = getToken();
-    if (!token) return;
-
-    try {
-      const response = await fetch(`http://localhost:5000/api/disciplinary/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP xatolik: ${response.status}`);
+  const handleDelete = (id) => {
+    dispatch(deleteDisciplinaryAction(id)).then((result) => {
+      if (result.error) {
+        toast.error(`Xatolik: ${result.payload}`);
+      } else {
+        toast.success("Jazo yozuvi muvaffaqiyatli o'chirildi!");
+        dispatch(fetchDisciplinaryActions()); // O‘chirishdan so‘ng qayta yuklash
       }
-
-      toast.success("Jazo yozuvi muvaffaqiyatli o'chirildi!");
-      fetchDisciplinaryData();
-    } catch (error) {
-      console.error("Jazo yozuvini o'chirishda xatolik:", error);
-      toast.error("Jazo yozuvini o'chirishda xatolik yuz berdi!");
-    }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -198,70 +99,46 @@ const DisciplinaryActions = () => {
       toast.error("Iltimos, xodimni tanlang!");
       return;
     }
-    const token = getToken();
-    if (!token) return;
 
-    try {
-      const response = await fetch("http://localhost:5000/api/disciplinary/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Ma'lumot qo'shishda xatolik yuz berdi");
+    dispatch(addDisciplinaryAction(formData)).then((result) => {
+      if (result.error) {
+        toast.error(`Xatolik: ${result.payload}`);
+      } else {
+        toast.success("Ma'lumot muvaffaqiyatli qo‘shildi!");
+        dispatch(resetFormData());
+        dispatch(fetchDisciplinaryActions()); // Qo‘shishdan so‘ng qayta yuklash
       }
-      toast.success("Ma'lumot muvaffaqiyatli qo‘shildi!");
-      fetchDisciplinaryData();
-      setFormData({
-        employeeId: "",
-        fullName: "",
-        position: "",
-        orderDetails: "",
-        orderDate: "",
-        reason: "",
-      });
-    } catch (error) {
-      console.error("Xatolik:", error);
-      toast.error("Xatolik: " + error.message);
-    }
+    });
   };
 
   const handleModalSubmit = async () => {
-    const token = getToken();
-    if (!token) return;
-
-    try {
-      const response = await fetch(`http://localhost:5000/api/disciplinary/${editData._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Ma'lumotni yangilashda xatolik yuz berdi");
+    const updatedData = {
+      employeeId: formData.employeeId,
+      fullName: formData.fullName,
+      position: formData.position,
+      orderDetails: formData.orderDetails,
+      orderDate: formData.orderDate ? new Date(formData.orderDate).toISOString() : "",
+      reason: formData.reason,
+    };
+    console.log("Yuborilayotgan updatedData:", updatedData);
+    dispatch(
+      updateDisciplinaryAction({ id: editData._id, formData: updatedData })
+    ).then((result) => {
+      if (result.error) {
+        toast.error(`Xatolik: ${result.payload}`);
+      } else {
+        toast.success("Ma'lumot muvaffaqiyatli o‘zgartirildi!");
+        dispatch(setIsModalOpen(false));
+        dispatch(resetFormData());
+        // Yangilangan orderDate yiliga mos selectedYear ni o‘rnatamiz
+        if (updatedData.orderDate) {
+          const updatedYear = new Date(updatedData.orderDate).getFullYear();
+          dispatch(setSelectedYear(updatedYear));
+        }
+        // Ma'lumotlarni qayta yuklash
+        dispatch(fetchDisciplinaryActions());
       }
-      toast.success("Ma'lumot muvaffaqiyatli o‘zgartirildi!");
-      setIsModalOpen(false);
-      fetchDisciplinaryData();
-      setFormData({
-        employeeId: "",
-        fullName: "",
-        position: "",
-        orderDetails: "",
-        orderDate: "",
-        reason: "",
-      });
-    } catch (error) {
-      console.error("Xatolik:", error);
-      toast.error("Xatolik: " + error.message);
-    }
+    });
   };
 
   const downloadPDF = () => {
@@ -277,7 +154,13 @@ const DisciplinaryActions = () => {
     );
     doc.text("MA’LUMOT", doc.internal.pageSize.getWidth() / 2, 27, { align: "center" });
 
-    const tableColumn = ["t/r", "Xodimning F.I.Sh.", "Lavozimi", "Intizomiy jazo (kim tomonidan, qachon berilgan va yurjik asosi)", "Izoh (sabab)"];
+    const tableColumn = [
+      "t/r",
+      "Xodimning F.I.Sh.",
+      "Lavozimi",
+      "Intizomiy jazo (kim tomonidan, qachon berilgan va yurjik asosi)",
+      "Izoh (sabab)",
+    ];
     const tableRows = filteredActions.map((action, index) => [
       index + 1,
       action.fullName,
@@ -436,7 +319,10 @@ const DisciplinaryActions = () => {
 
     signatureRows.forEach((_, rowIndex) => {
       for (let col = 0; col < 5; col++) {
-        const cellAddress = XLSX.utils.encode_cell({ r: headerRowIndex + tableRows.length + 1 + rowIndex, c: col });
+        const cellAddress = XLSX.utils.encode_cell({
+          r: headerRowIndex + tableRows.length + 1 + rowIndex,
+          c: col,
+        });
         if (worksheet[cellAddress]) {
           worksheet[cellAddress].s = {
             font: { name: "Times New Roman" },
@@ -451,35 +337,50 @@ const DisciplinaryActions = () => {
     XLSX.writeFile(workbook, "intizomiy_jazolar.xlsx");
   };
 
-  if (loading) return <Spin tip="Ma'lumotlar yuklanmoqda..." />;
+  if (disciplinaryStatus === "loading") {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <Spin tip="Ma'lumotlar yuklanmoqda..." />
+      </div>
+    );
+  }
 
   return (
-    <div className="employee-container">
+    <div
+      className={`p-6 rounded-lg shadow-md ${
+        isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+      }`}
+    >
       <ToastContainer />
-      <h2 style={{ color: "#1890ff", marginBottom: "20px" }}>Intizomiy Jazolar</h2>
+      <h2 className="text-2xl font-bold text-blue-500 mb-6">Intizomiy Jazolar</h2>
 
-      <div className="filter-container">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <DatePicker
           selected={selectedYear ? new Date(selectedYear, 0, 1) : null}
-          onChange={(date) => setSelectedYear(date ? date.getFullYear() : null)}
+          onChange={(date) => dispatch(setSelectedYear(date ? date.getFullYear() : null))}
           dateFormat="yyyy"
           showYearPicker
           placeholderText="Yilni tanlang"
-          className="date-picker"
+          className="w-full sm:w-48 p-2 border rounded-md mb-4 sm:mb-0"
         />
-        <button onClick={() => setSelectedYear(null)}>Filterni tozalash</button>
+        <Button
+          onClick={() => dispatch(setSelectedYear(null))}
+          className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white rounded-md px-4 py-2"
+        >
+          Filterni tozalash
+        </Button>
       </div>
 
-      <form className="disciplinary-form" onSubmit={handleSubmit}>
-        <div className="form-row">
-          <div className="form-group">
+      <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
             <Select
               showSearch
               placeholder="Xodimni tanlang"
               optionFilterProp="children"
               onChange={handleSelectChange}
               value={formData.employeeId || undefined}
-              style={{ width: "100%" }}
+              className="w-full"
               filterOption={(input, option) =>
                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
@@ -491,7 +392,7 @@ const DisciplinaryActions = () => {
               ))}
             </Select>
           </div>
-          <div className="form-group">
+          <div>
             <input
               type="text"
               name="fullName"
@@ -500,11 +401,12 @@ const DisciplinaryActions = () => {
               onChange={handleChange}
               disabled
               required
+              className="w-full p-2 border rounded-md bg-gray-100"
             />
           </div>
         </div>
-        <div className="form-row">
-          <div className="form-group">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
             <input
               type="text"
               name="position"
@@ -513,9 +415,10 @@ const DisciplinaryActions = () => {
               onChange={handleChange}
               disabled
               required
+              className="w-full p-2 border rounded-md bg-gray-100"
             />
           </div>
-          <div className="form-group">
+          <div>
             <input
               type="text"
               name="orderDetails"
@@ -523,20 +426,22 @@ const DisciplinaryActions = () => {
               value={formData.orderDetails}
               onChange={handleChange}
               required
+              className="w-full p-2 border rounded-md"
             />
           </div>
         </div>
-        <div className="form-row">
-          <div className="form-group">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
             <input
               type="date"
               name="orderDate"
               value={formData.orderDate}
               onChange={handleChange}
               required
+              className="w-full p-2 border rounded-md"
             />
           </div>
-          <div className="form-group">
+          <div>
             <input
               type="text"
               name="reason"
@@ -544,108 +449,132 @@ const DisciplinaryActions = () => {
               value={formData.reason}
               onChange={handleChange}
               required
+              className="w-full p-2 border rounded-md"
             />
           </div>
         </div>
-        <div className="form-actions">
-          <button type="submit">Qo'shish</button>
+        <div className="flex justify-end">
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-md px-4 py-2"
+          >
+            Qo'shish
+          </Button>
         </div>
       </form>
 
-      <Table
-        columns={[
-          {
-            title: "№",
-            dataIndex: "index",
-            key: "index",
-            render: (_, __, index) => index + 1,
-          },
-          {
-            title: "F.I.Sh",
-            dataIndex: "fullName",
-            key: "fullName",
-          },
-          {
-            title: "Lavozim",
-            dataIndex: "position",
-            key: "position",
-          },
-          {
-            title: "Buyruq Tafsilotlari",
-            dataIndex: "orderDetails",
-            key: "orderDetails",
-          },
-          {
-            title: "Buyruq Sanasi",
-            dataIndex: "orderDate",
-            key: "orderDate",
-            render: (date) => new Date(date).toLocaleDateString(),
-          },
-          {
-            title: "Sabab",
-            dataIndex: "reason",
-            key: "reason",
-          },
-          {
-            title: "Amallar",
-            key: "action",
-            render: (_, record) => (
-              <div>
-                <Button type="primary" icon={<EditOutlined />} onClick={() => handleEdit(record)} style={{ marginRight: 8 }} />
-                <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record._id)} />
-              </div>
-            ),
-          },
-        ]}
-        dataSource={filteredActions}
-        rowKey="_id"
-        pagination={{ pageSize: 10 }}
-        bordered
-        className="employee-table"
-      />
-      <div className="btn">
-        <Button type="primary" icon={<FilePdfOutlined />} onClick={downloadPDF}>
+      {disciplinaryStatus === "failed" ? (
+        <p className="text-center text-red-500">{disciplinaryError}</p>
+      ) : (
+        <Table
+          columns={[
+            {
+              title: "№",
+              dataIndex: "index",
+              key: "index",
+              render: (_, __, index) => index + 1,
+            },
+            {
+              title: "F.I.Sh",
+              dataIndex: "fullName",
+              key: "fullName",
+            },
+            {
+              title: "Lavozim",
+              dataIndex: "position",
+              key: "position",
+            },
+            {
+              title: "Buyruq Tafsilotlari",
+              dataIndex: "orderDetails",
+              key: "orderDetails",
+            },
+            {
+              title: "Buyruq Sanasi",
+              dataIndex: "orderDate",
+              key: "orderDate",
+              render: (date) => {
+                if (!date || isNaN(new Date(date))) {
+                  return "Noma'lum sana";
+                }
+                return new Date(date).toLocaleDateString();
+              },
+            },
+            {
+              title: "Sabab",
+              dataIndex: "reason",
+              key: "reason",
+            },
+            {
+              title: "Amallar",
+              key: "action",
+              render: (_, record) => (
+                <div className="flex space-x-2">
+                  <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    onClick={() => handleEdit(record)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+                  />
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => handleDelete(record._id)}
+                    className="bg-red-500 hover:bg-red-600 text-white rounded-md"
+                  />
+                </div>
+              ),
+            },
+          ]}
+          dataSource={filteredActions}
+          rowKey={(record, index) => record._id || `row-${index}`}
+          pagination={{ pageSize: 10 }}
+          bordered
+          className={`${isDarkMode ? "ant-table-dark" : ""}`}
+        />
+      )}
+
+      <div className="flex space-x-4 mt-6">
+        <Button
+          type="primary"
+          icon={<FilePdfOutlined />}
+          onClick={downloadPDF}
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded-md px-4 py-2"
+        >
           PDF yuklab olish
         </Button>
-        <Button type="default" icon={<FileExcelOutlined />} onClick={downloadExcel}>
+        <Button
+          type="default"
+          icon={<FileExcelOutlined />}
+          onClick={downloadExcel}
+          className="bg-green-500 hover:bg-green-600 text-white rounded-md px-4 py-2"
+        >
           Excel yuklab olish
         </Button>
       </div>
+
       <Modal
-        title="Ma'lumotni o'zgartirish"
+        title={<span className="text-blue-500">Ma'lumotni o'zgartirish</span>}
         open={isModalOpen}
         onOk={handleModalSubmit}
-        onCancel={() => setIsModalOpen(false)}
-        footer={[
-          <Button key="back" onClick={() => setIsModalOpen(false)}>
-            Bekor qilish
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleModalSubmit}>
-            Saqlash
-          </Button>,
-        ]}
+        onCancel={() => dispatch(setIsModalOpen(false))}
+        okText="Saqlash"
+        cancelText="Bekor qilish"
+        okButtonProps={{ className: "bg-blue-500 hover:bg-blue-600" }}
+        cancelButtonProps={{ className: "bg-gray-300 hover:bg-gray-400" }}
       >
         {editData && (
-          <form onSubmit={(e) => { e.preventDefault(); handleModalSubmit(); }}>
-            <div className="form-row">
-              <div className="form-group">
+          <form onSubmit={(e) => { e.preventDefault(); handleModalSubmit(); }} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
                 <Select
                   showSearch
                   placeholder="Xodimni tanlang"
                   optionFilterProp="children"
-                  onChange={(value) => {
-                    const selectedEmployee = employees.find((emp) => emp._id === value);
-                    if (selectedEmployee) {
-                      setFormData({
-                        ...formData,
-                        employeeId: value,
-                        fullName: selectedEmployee.passportData.fullName,
-                        position: selectedEmployee.jobData.position,
-                      });
-                    }
-                  }}
+                  onChange={handleSelectChange}
                   value={formData.employeeId || undefined}
-                  style={{ width: "100%" }}
+                  className="w-full"
                   filterOption={(input, option) =>
                     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                   }
@@ -657,7 +586,7 @@ const DisciplinaryActions = () => {
                   ))}
                 </Select>
               </div>
-              <div className="form-group">
+              <div>
                 <input
                   type="text"
                   name="fullName"
@@ -666,12 +595,12 @@ const DisciplinaryActions = () => {
                   onChange={handleChange}
                   disabled
                   required
-                  style={{ width: "100%" }}
+                  className="w-full p-2 border rounded-md bg-gray-100"
                 />
               </div>
             </div>
-            <div className="form-row">
-              <div className="form-group">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
                 <input
                   type="text"
                   name="position"
@@ -680,10 +609,10 @@ const DisciplinaryActions = () => {
                   onChange={handleChange}
                   disabled
                   required
-                  style={{ width: "100%" }}
+                  className="w-full p-2 border rounded-md bg-gray-100"
                 />
               </div>
-              <div className="form-group">
+              <div>
                 <input
                   type="text"
                   name="orderDetails"
@@ -691,22 +620,22 @@ const DisciplinaryActions = () => {
                   value={formData.orderDetails}
                   onChange={handleChange}
                   required
-                  style={{ width: "100%" }}
+                  className="w-full p-2 border rounded-md"
                 />
               </div>
             </div>
-            <div className="form-row">
-              <div className="form-group">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
                 <input
                   type="date"
                   name="orderDate"
                   value={formData.orderDate}
                   onChange={handleChange}
                   required
-                  style={{ width: "100%" }}
+                  className="w-full p-2 border rounded-md"
                 />
               </div>
-              <div className="form-group">
+              <div>
                 <input
                   type="text"
                   name="reason"
@@ -714,7 +643,7 @@ const DisciplinaryActions = () => {
                   value={formData.reason}
                   onChange={handleChange}
                   required
-                  style={{ width: "100%" }}
+                  className="w-full p-2 border rounded-md"
                 />
               </div>
             </div>

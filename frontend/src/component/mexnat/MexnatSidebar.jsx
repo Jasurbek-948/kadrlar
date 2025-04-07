@@ -63,7 +63,7 @@ const Sidebar = () => {
               <span>Arxiv</span>
             </Link>
           </li>
-         
+
         </ul>
       </nav>
     </div>

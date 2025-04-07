@@ -6,17 +6,17 @@ const positionsByDepartment = require("../config/positionsByDepartment");
 const path = require("path");
 const fs = require("fs");
 const mongoose = require("mongoose");
-const authenticateToken = require("../middleware/auth"); // Token tekshiruvi middleware
-
+const authenticateToken = require("../middleware/auth");
+                     
 // Barcha xodimlarni olish (arxivlanmaganlar)
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    console.log("GET /api/employees so'rovi:", req.headers.authorization); // Tokenni tekshirish
+    console.log("GET /api/employees so'rovi:", req.headers.authorization);
     const employees = await Employee.find({ isArchived: false });
-    console.log("Topilgan xodimlar soni:", employees.length); // Ma'lumotlar sonini log qilamiz
+    console.log("Topilgan xodimlar soni:", employees.length);
     if (employees.length === 0) {
       console.log("Arxivlanmagan xodimlar topilmadi");
-      return res.status(200).json([]); // Bo'sh array qaytarish
+      return res.status(200).json([]);
     }
     res.status(200).json(employees);
   } catch (err) {
@@ -28,7 +28,7 @@ router.get("/", authenticateToken, async (req, res) => {
 // ID bo'yicha xodimni olish
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
-    console.log(`GET /api/employees/${req.params.id} so'rovi:`); // Debug log
+    console.log(`GET /api/employees/${req.params.id} so'rovi:`);
     const employee = await Employee.findById(req.params.id);
     if (!employee) return res.status(404).json({ error: "Xodim topilmadi!" });
     res.status(200).json(employee);
@@ -41,7 +41,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
 // Xodim ma'lumotlarini to'liq yangilash
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
-    console.log(`PUT /api/employees/${req.params.id} so'rovi:`, req.body); // Debug log
+    console.log(`PUT /api/employees/${req.params.id} so'rovi:`, req.body);
     const { id } = req.params;
     const updatedEmployee = await Employee.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -59,6 +59,9 @@ router.put("/:id", authenticateToken, async (req, res) => {
     if (error.name === "ValidationError") {
       const validationErrors = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: validationErrors.join(" ") });
+    }
+    if (error.message.includes("Bunday xodim oldin ro‘yxatdan o‘tgan")) {
+      return res.status(400).json({ message: "Bunday xodim oldin ro‘yxatdan o‘tgan!" });
     }
     res.status(500).json({ message: "Serverda xatolik yuz berdi!", details: error.message });
   }
@@ -132,18 +135,29 @@ router.put("/:id/vacation", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/check-insp/:insp", async (req, res) => {
+  try {
+    const { insp } = req.params;
+    const employee = await Employee.findOne({ "passportData.insp": insp });
+    if (employee) {
+      return res.status(400).json({ message: "Bunday xodim oldin ro‘yxatdan o‘tgan!" });
+    }
+    res.status(200).json({ message: "INPS noyob!" });
+  } catch (error) {
+    res.status(500).json({ message: "Server xatosi!" });
+  }
+});
+
 // Yangi xodim qo'shish
 router.post("/", authenticateToken, async (req, res) => {
   try {
-    console.log("POST /api/employees so'rovi:", req.body); // Debug log
+    console.log("POST /api/employees so'rovi:", req.body);
     const { passportData, jobData, educationData } = req.body;
 
-    // 1-qadam: Asosiy bo'limlarni tekshirish
     if (!passportData || !jobData || !educationData) {
       return res.status(400).json({ error: "Barcha bo'limlar (passportData, jobData, educationData) to'ldirilishi kerak!" });
     }
 
-    // 2-qadam: Majburiy maydonlarni tekshirish
     const requiredFields = {
       passportData: ["fullName", "inn", "insp", "address", "passportSeries", "passportNumber", "issuedBy", "issuedDate", "birthDate", "gender", "birthPlace", "nationality", "phoneNumber"],
       jobData: ["department", "position", "grade", "salary", "employmentContract", "hireDate", "orderNumber"],
@@ -163,7 +177,6 @@ router.post("/", authenticateToken, async (req, res) => {
       return res.status(400).json({ error: errors.join(" ") });
     }
 
-    // 3-qadam: Bo'lim va lavozimni tekshirish
     const department = jobData.department;
     const position = jobData.position;
 
@@ -177,10 +190,9 @@ router.post("/", authenticateToken, async (req, res) => {
       return res.status(400).json({ error: "Noto'g'ri lavozim tanlandi!" });
     }
 
-    // 4-qadam: Bo'lim bo'yicha umumiy cheklovni tekshirish
     const departmentCount = await Employee.countDocuments({
       "jobData.department": department,
-      isArchived: false, // Faqat faol xodimlar hisobga olinadi
+      isArchived: false,
     });
     if (departmentCount >= departmentData.maxEmployees) {
       return res.status(400).json({
@@ -188,11 +200,10 @@ router.post("/", authenticateToken, async (req, res) => {
       });
     }
 
-    // 5-qadam: Lavozim bo'yicha cheklovni tekshirish
     const positionCount = await Employee.countDocuments({
       "jobData.department": department,
       "jobData.position": position,
-      isArchived: false, // Faqat faol xodimlar hisobga olinadi
+      isArchived: false,
     });
     if (positionCount >= positionData.max) {
       return res.status(400).json({
@@ -200,7 +211,6 @@ router.post("/", authenticateToken, async (req, res) => {
       });
     }
 
-    // 6-qadam: Yangi xodimni yaratish
     const newEmployee = new Employee({
       passportData,
       jobData,
@@ -216,6 +226,9 @@ router.post("/", authenticateToken, async (req, res) => {
       const validationErrors = Object.values(err.errors).map((error) => error.message);
       return res.status(400).json({ error: validationErrors.join(" ") });
     }
+    if (err.message.includes("Bunday xodim oldin ro‘yxatdan o‘tgan")) {
+      return res.status(400).json({ error: "Bunday xodim oldin ro‘yxatdan o‘tgan!" });
+    }
     res.status(500).json({ error: "Serverda xatolik yuz berdi!", details: err.message });
   }
 });
@@ -223,7 +236,7 @@ router.post("/", authenticateToken, async (req, res) => {
 // Hujjatlarni qo'shish uchun API
 router.post("/:id/documents", authenticateToken, upload.array("files", 10), async (req, res) => {
   try {
-    console.log(`POST /api/employees/${req.params.id}/documents so'rovi:`, req.body); // Debug log
+    console.log(`POST /api/employees/${req.params.id}/documents so'rovi:`, req.body);
     const { id } = req.params;
     const { names } = req.body;
     const files = req.files;
@@ -264,7 +277,7 @@ router.post("/:id/documents", authenticateToken, upload.array("files", 10), asyn
 // Fayllarni olish
 router.get("/:id/documents", authenticateToken, async (req, res) => {
   try {
-    console.log(`GET /api/employees/${req.params.id}/documents so'rovi:`); // Debug log
+    console.log(`GET /api/employees/${req.params.id}/documents so'rovi:`);
     const { id } = req.params;
     const employee = await Employee.findById(id);
     if (!employee) {
@@ -280,7 +293,7 @@ router.get("/:id/documents", authenticateToken, async (req, res) => {
 // Fayllarni o'chirish
 router.delete("/:id/documents/:fileName", authenticateToken, async (req, res) => {
   try {
-    console.log(`DELETE /api/employees/${req.params.id}/documents/${req.params.fileName} so'rovi:`); // Debug log
+    console.log(`DELETE /api/employees/${req.params.id}/documents/${req.params.fileName} so'rovi:`);
     const { id, fileName } = req.params;
     const employee = await Employee.findById(id);
     if (!employee) {
@@ -316,20 +329,43 @@ router.put("/archive/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    console.log(`PUT /api/employees/archive/${id} so'rovi:`); // Debug log
+    console.log(`PUT /api/employees/archive/${id} so'rovi:`);
     const employee = await Employee.findById(id);
     if (!employee) {
       return res.status(404).json({ message: "Xodim topilmadi!" });
     }
 
     employee.isArchived = true;
-    employee.archiveDate = new Date(); // "O'chirish" tugmasi bosilgan vaqtni o'rnatamiz
+    employee.archiveDate = new Date();
     await employee.save();
 
     res.status(200).json({ message: "Xodim arxivga ko'chirildi!" });
   } catch (error) {
     console.error("Xodimni arxivga ko'chirishda xatolik:", error.message);
     res.status(500).json({ error: "Server xatoligi!", details: error.message });
+  }
+});
+
+// Xodimlar sonini hisoblash endpoint’i
+router.get("/employee-counts", authenticateToken, async (req, res) => {
+  try {
+    console.log("GET /api/employee-counts so'rovi:", req.headers.authorization);
+    const employees = await Employee.find({ isArchived: false });
+    console.log("Faol xodimlar soni:", employees.length);
+
+    const counts = {};
+    employees.forEach((employee) => {
+      const department = employee.jobData.department;
+      const position = employee.jobData.position;
+      if (!counts[department]) counts[department] = {};
+      counts[department][position] = (counts[department][position] || 0) + 1;
+    });
+
+    console.log("Hisoblangan xodimlar soni:", counts);
+    res.status(200).json(counts);
+  } catch (error) {
+    console.error("Xodimlar sonini hisoblashda xatolik:", error.message);
+    res.status(500).json({ message: "Xodimlar sonini hisoblashda xatolik!", details: error.message });
   }
 });
 

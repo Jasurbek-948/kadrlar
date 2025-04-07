@@ -1,3 +1,9 @@
+/* index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global stillar */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,9 +11,122 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply bg-background-light text-gray-900; /* Light mode uchun default fon */
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Dark mode uchun umumiy fon */
+body.dark {
+  @apply bg-background-dark text-gray-200; /* tailwind.config.js'dan background.dark (#1F2937) */
+}
+
+/* Ant Design Table komponenti uchun dark mode stillari */
+.ant-table-dark .ant-table-thead > tr > th {
+  background: #374151 !important; /* Dark mode uchun mos rang */
+  color: #d1d5db !important; /* Matn rangi */
+}
+
+.ant-table-dark .ant-table-tbody > tr > td {
+  background: #1F2937 !important; /* background.dark */
+  color: #d1d5db !important;
+  border-color: #374151 !important;
+}
+
+.ant-table-dark .ant-table-tbody > tr:hover > td {
+  background: #4b5563 !important; /* Hover holatida */
+}
+
+/* Ant Design Modal komponenti uchun dark mode stillari */
+.dark-modal .ant-modal-content {
+  background: #1F2937 !important; /* background.dark */
+  color: #d1d5db !important;
+}
+
+.dark-modal .ant-modal-header {
+  background: #1F2937 !important; /* background.dark */
+  border-color: #374151 !important;
+}
+
+.dark-modal .ant-modal-title {
+  color: #d1d5db !important;
+}
+
+.dark-modal .ant-modal-close-x {
+  color: #d1d5db !important;
+}
+
+/* Ant Design Input komponenti uchun dark mode stillari */
+.dark .ant-input {
+  background: #374151 !important;
+  color: #d1d5db !important;
+  border-color: #4b5563 !important;
+}
+
+.dark .ant-input:hover,
+.dark .ant-input:focus {
+  border-color: #1D4ED8 !important; /* primary rang */
+  box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2) !important; /* primary rangning opacity bilan soya effekti */
+}
+
+.dark .ant-input input {
+  color: #d1d5db !important;
+}
+
+.dark .ant-input .ant-input-prefix,
+.dark .ant-input .ant-input-suffix {
+  color: #d1d5db !important;
+}
+
+/* Ant Design Select komponenti uchun dark mode stillari */
+.dark .ant-select-selector {
+  background: #374151 !important;
+  color: #d1d5db !important;
+  border-color: #4b5563 !important;
+}
+
+.dark .ant-select-arrow {
+  color: #d1d5db !important;
+}
+
+/* Ant Design DatePicker komponenti uchun dark mode stillari */
+.dark .ant-picker {
+  background: #374151 !important;
+  color: #d1d5db !important;
+  border-color: #4b5563 !important;
+}
+
+.dark .ant-picker .ant-picker-input > input {
+  color: #d1d5db !important;
+}
+
+.dark .ant-picker .ant-picker-suffix {
+  color: #d1d5db !important;
+}
+
+/* Ant Design Steps komponenti uchun dark mode stillari */
+.dark .ant-steps-item-title {
+  color: #d1d5db !important;
+}
+
+.dark .ant-steps-item-description {
+  color: #a0aec0 !important;
+}
+
+/* Ant Design Button komponenti uchun dark mode stillari */
+.dark .ant-btn-primary {
+  background-color: #1D4ED8 !important; /* primary rang */
+  border-color: #1D4ED8 !important;
+}
+
+.dark .ant-btn {
+  color: #d1d5db !important;
+}
+
+/* Yuklanish animatsiyasi uchun */
+.ant-spin-dot-item {
+  background-color: #1D4ED8 !important; /* primary rang */
 }

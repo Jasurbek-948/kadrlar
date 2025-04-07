@@ -1,100 +1,90 @@
-import React, { useState, useEffect } from "react";
-import { message } from "antd"; // `message` ni import qilamiz
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "../../styles/files.scss";
+import { fetchDocuments, resetDocumentsState } from "../../../redux/slices/employeeSlice";
 
 const Files = ({ employeeId }) => {
-  const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const { documents, documentsStatus, documentsError } = useSelector(
+    (state) => state.employees
+  );
+  const { isDarkMode } = useSelector((state) => state.theme);
 
   useEffect(() => {
-    const fetchDocuments = async () => {
-      const token = localStorage.getItem("token"); // Tokenni olish
-      if (!token) {
-        setError("Tizimga kiring!");
-        setLoading(false);
-        return;
-      }
+    dispatch(fetchDocuments(employeeId));
 
-      try {
-        const response = await fetch(`http://localhost:5000/api/employees/${employeeId}/documents`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Token qo'shildi
-          },
-        });
-        console.log("Server javobi statusi:", response.status); // Statusni log qilamiz
-        if (!response.ok) {
-          if (response.status === 401) {
-            localStorage.removeItem("token");
-            setError("Tizimga qayta kiring! Token yaroqsiz.");
-            toast.error("Tizimga qayta kiring! Token yaroqsiz.", {
-              position: "top-right",
-              autoClose: 3000,
-            });
-            return;
-          }
-          const errorData = await response.json();
-          throw new Error(errorData.message || `Server xatosi: ${response.status} - ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log("Olingan hujjatlar:", data); // Ma'lumotlarni log qilamiz
-        setFiles(data.documents || []);
-      } catch (err) {
-        console.error("Hujjatlarni olishda xatolik:", err);
-        setError(err.message || "Server bilan ulanishda xatolik yuz berdi.");
-        toast.error(`❌ Xatolik: ${err.message}`, {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      } finally {
-        setLoading(false);
-      }
+    // Komponent unmount bo‘lganda state’ni tozalash
+    return () => {
+      dispatch(resetDocumentsState());
     };
+  }, [dispatch, employeeId]);
 
-    fetchDocuments();
-  }, [employeeId]);
+  useEffect(() => {
+    if (documentsStatus === "failed" && documentsError) {
+      toast.error(`❌ Xatolik: ${documentsError}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  }, [documentsStatus, documentsError]);
 
-  // Faylni yuklab olish funksiyasi
-  const downloadFile = (filePath) => {
+  const openFile = (filePath) => {
     if (!filePath) {
-      message.error("Fayl yo'li noto'g'ri!");
+      toast.error("Fayl yo'li noto'g'ri!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
     try {
-      const fullUrl = `http://localhost:5000${filePath.startsWith("/") ? "" : "/"}${filePath}`; // To'liq URL
-      const link = document.createElement("a");
-      link.href = fullUrl;
-      link.setAttribute("download", ""); // Faylni yuklab olish
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const fullUrl = `http://localhost:5000${filePath.startsWith("/") ? "" : "/"}${filePath}`;
+      window.open(fullUrl, "_blank"); // Faylni yangi tabda ochish
     } catch (error) {
-      console.error("Faylni yuklab olishda xatolik:", error);
-      message.error("Faylni yuklab olishda xatolik yuz berdi!");
+      console.error("Faylni ochishda xatolik:", error);
+      toast.error("Faylni ochishda xatolik yuz berdi!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
 
   return (
-    <div className="files-container">
+    <div
+      className={`p-6 rounded-lg shadow-md ${
+        isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+      }`}
+    >
       <ToastContainer />
-      <h1>Fayllarni Yuklab Olish</h1>
-      <div className="file-list">
-        {loading ? (
-          <p>Yuklanmoqda...</p>
-        ) : error ? (
-          <p className="error">{error}</p>
-        ) : files.length > 0 ? (
-          files.map((file, index) => (
-            <div className="file-card" key={index}>
-              <h3>{file.fileName || file.name || "Noma'lum fayl"}</h3>
-              <button onClick={() => downloadFile(file.filePath)}>Yuklab olish</button>
+      <h1 className="text-2xl font-semibold text-blue-500 mb-5">
+        Fayllarni Ko‘rish
+      </h1>
+      <div className="flex flex-col gap-4">
+        {documentsStatus === "loading" ? (
+          <p className="text-gray-500 dark:text-gray-400">Yuklanmoqda...</p>
+        ) : documentsStatus === "failed" && documentsError ? (
+          <p className="text-red-500">{documentsError}</p>
+        ) : documents.length > 0 ? (
+          documents.map((file, index) => (
+            <div
+              key={index}
+              className={`flex justify-between items-center p-4 rounded-md shadow-sm ${
+                isDarkMode ? "bg-gray-700" : "bg-gray-100"
+              }`}
+            >
+              <h3 className="text-lg font-medium">
+                {file.fileName || file.name || "Noma'lum fayl"}
+              </h3>
+              <button
+                onClick={() => openFile(file.filePath)}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded-md transition-colors"
+              >
+                Ko‘rish
+              </button>
             </div>
           ))
         ) : (
-          <p>Fayllar mavjud emas</p>
+          <p className="text-gray-500 dark:text-gray-400">Fayllar mavjud emas</p>
         )}
       </div>
     </div>

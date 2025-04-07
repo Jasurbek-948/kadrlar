@@ -1,0 +1,71 @@
+.sidebar {
+    // width: 250px;
+    // height: 100vh; // To'liq ekran balandligi
+    // background-color: #ffffff; // Tailwind: bg-white
+    // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); // Tailwind: shadow-md
+    // color: #374151; // Tailwind: text-gray-700
+    // display: flex;
+    // flex-direction: column;
+    padding: 24px;
+    // box-sizing: border-box;
+    // position: fixed;
+    // top: 0;
+    // left: 0;
+    // overflow-y: auto;
+
+    &.dark {
+        background-color: #1f2937; // Tailwind: bg-gray-800
+        color: #d1d5db; // Tailwind: text-gray-300
+    }
+}
+
+.menu {
+    flex: 1;
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.menu-item {
+    margin: 8px 0;
+
+    a {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #4b5563; // Tailwind: text-gray-600
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 0.875rem; // Tailwind: text-sm
+        font-weight: 500;
+        transition: background-color 0.2s ease, color 0.2s ease;
+
+        &:hover {
+            background-color: #f3f4f6; // Tailwind: hover:bg-gray-100
+            color: #1f2937; // Tailwind: hover:text-gray-900
+        }
+    }
+
+    &.active a {
+        background-color: #3b82f6; // Tailwind: bg-blue-500
+        color: #ffffff; // Tailwind: text-white
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3); // Tailwind: shadow-sm
+
+        &:hover {
+            background-color: #2563eb; // Tailwind: hover:bg-blue-600
+        }
+    }
+}
+
+.fontawesome {
+    margin-right: 12px; // Ikonka va matn orasidagi masofa
+    font-size: 1rem; // Tailwind: text-base
+}
+
+span {
+    flex: 1; // Matnni ikonadan keyin to'g'ri joylashtirish
+}

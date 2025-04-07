@@ -10,6 +10,7 @@ const archiveRoutes = require("./routes/archiveRoutes");
 const disciplinaryRoutes = require("./routes/disciplinaryRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
 const authRoutes = require("./routes/auth");
+const countRoutes = require("./routes/countRoutes")
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use("/api/employees", employeeRoutes);
 app.use("/api/disciplinary", disciplinaryRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/archive", archiveRoutes);
+app.use("/api/employee-counts", countRoutes);
 
 // MongoDB ulanish
 mongoose

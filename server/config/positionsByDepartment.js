@@ -1,5 +1,5 @@
-const positionsByDepartment  ={ 
-    "Boshqaruv Apparati": {
+const positionsByDepartment = {
+  "Boshqaruv Apparati": {
     positions: [
       { name: "Gidroelektrostansiya direktori", max: 1 },
       { name: "Bosh muxandis", max: 1 },
@@ -9,25 +9,25 @@ const positionsByDepartment  ={
     ],
     maxEmployees: 5, // Bo'lim bo'yicha umumiy cheklov
   },
-    "Buxgalteriya": {
+  "Buxgalteriya": {
     positions: [
       { name: "Xisobchi", max: 2 },
       { name: "Material xisobchi", max: 1 },
     ],
     maxEmployees: 3,
   },
-    "Inson resurslari bo'limi": {
+  "Inson resurslari bo'limi": {
     maxEmployees: 5, // Bo'lim bo'yicha umumiy cheklov
     positions: [
       { name: "Inson resurslari bo'limi boshlig'i", max: 1 },
       { name: "Inson resurslari bo'yicha menejer", max: 4 },
     ],
   },
-    "Yuristkonsul": {
+  "Yuristkonsul": {
     maxEmployees: 1,
     positions: [{ name: "Yuristkonsul", max: 1 }],
   },
-    "Mutaxassislar": {
+  "Mutaxassislar": {
     maxEmployees: 3,
     positions: [
       { name: "Favqulotda vaziyatlar bo'yicha muhandis", max: 1 },
@@ -35,7 +35,7 @@ const positionsByDepartment  ={
       { name: "Ish yuritish bo'yicha, Arxivarus", max: 1 },
     ],
   },
-    "AKTni joriy etish va axborot xavfsizligi bo'limi": {
+  "AKTni joriy etish va axborot xavfsizligi bo'limi": {
     maxEmployees: 3,
     positions: [
       { name: "AKT bo'lim boshlig'i", max: 1 },
@@ -49,7 +49,7 @@ const positionsByDepartment  ={
       { name: "Ishlab chiqarish va texnika bo'limi muhandisi", max: 4 },
     ],
   },
-    "Gidromexanika sexi": {
+  "Gidromexanika sexi": {
     maxEmployees: 15,
     positions: [
       { name: "Sex boshlig'i", max: 1 },
@@ -62,7 +62,7 @@ const positionsByDepartment  ={
       { name: "Tokar", max: 1 },
     ],
   },
-    "Tezkor dispecherlik hizmati bo'limi": {
+  "Tezkor dispecherlik hizmati bo'limi": {
     maxEmployees: 5,
     positions: [
       { name: "Dispetchirlik (ishlab chiqarish-dispetchirlik xizmati) boshlig'i", max: 1 },
@@ -70,7 +70,7 @@ const positionsByDepartment  ={
       { name: "Elektrostansiya smena boshlig'i", max: 2 },
     ],
   },
-    "Avtomatika va rele himoyasi bo'limi": {
+  "Avtomatika va rele himoyasi bo'limi": {
     maxEmployees: 6,
     positions: [
       { name: "Ishlab chiqarish-texnologik laboratoriyasi boshlig'i", max: 1 },
@@ -89,14 +89,14 @@ const positionsByDepartment  ={
       { name: "Texnologik jarayonlarni avtomatik tarzda boshqarish tizimlari bo'yicha texnik", max: 3 },
     ],
   },
-    "Suv omborini xavfsiz eksplatatsiya qilish boshqarmasi": {
+  "Suv omborini xavfsiz eksplatatsiya qilish boshqarmasi": {
     maxEmployees: 5,
     positions: [
       { name: "Bosh muxandis", max: 1 },
       { name: "Bosh muxandis o'rinbosari", max: 1 },
     ],
   },
-    "Mutaxassislar suv ombor": {
+  "Mutaxassislar suv ombor": {
     maxEmployees: 6,
     positions: [
       { name: "Ishlab chiqarish- texnika bo'lim muxandisi", max: 2 },
@@ -163,7 +163,7 @@ const positionsByDepartment  ={
       { name: "Bog'bon", max: 1 },
     ],
   },
-    "Andijon-2 gidroelektrstansiyasi": {
+  "Andijon-2 gidroelektrstansiyasi": {
     maxEmployees: 5,
     positions: [
       { name: "Ekspluatasiya (GES) boshlig'i", max: 1 },
@@ -171,7 +171,7 @@ const positionsByDepartment  ={
       { name: "Elektrostansiya sexi smena boshlig'i", max: 2 },
     ],
   },
-    "Kudash gidroelektrstansiyasi": {
+  "Kudash gidroelektrstansiyasi": {
     maxEmployees: 4,
     positions: [
       { name: "Ekspluatasiya (GES) boshlig'i", max: 1 },
@@ -184,7 +184,7 @@ const positionsByDepartment  ={
     maxEmployees: 1,
     positions: [{ name: "Elektrostansiya smena boshlig'i", max: 1 }],
   },
-    "Xizmat ko'rsatuvchi hodimlar bo'limi": {
+  "Xizmat ko'rsatuvchi hodimlar bo'limi": {
     maxEmployees: 12,
     positions: [
       { name: "Mexanik", max: 1 },

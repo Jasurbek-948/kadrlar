@@ -1,0 +1,176 @@
+.sidebar {
+    // width: 300px;
+    // /* Tugmalar uzun yozuvlarga moslash uchun kenglikni oshiramiz */
+    // padding: 20px;
+    // background: #fff;
+    // height: 100vh;
+    // position: fixed;
+    // top: 0;
+    // left: 0;
+    // box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    // font-family: 'Roboto', sans-serif;
+    // overflow-y: auto;
+    // /* Agar kontent uzun bo'lsa, skroll paydo bo'ladi */
+}
+
+.filter-section {
+    margin-bottom: 30px;
+    width: 300px;
+    margin-left: 20px;
+    margin-top: 20px;
+
+    h4 {
+        font-size: 16px;
+        font-weight: 500;
+        color: #6b7280;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+
+    }
+
+    .filter-btn {
+        padding: 10px 15px;
+        background: #fff;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-align: left;
+        white-space: normal;
+        /* Matn bir nechta qatorga bo'linadi */
+        word-wrap: break-word;
+        /* Uzun so'zlar bo'linadi */
+        line-height: 1.4;
+        /* Qatorlar orasidagi masofa */
+        min-height: 50px;
+        /* Tugma balandligini oshiramiz */
+
+        &:hover {
+            background: #e5f0fa;
+            color: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        &.active {
+            background: #e5f0fa;
+            color: #1d4ed8;
+            border-color: #1d4ed8;
+            font-weight: 500;
+        }
+    }
+
+    .clear-btn {
+        padding: 10px 15px;
+        background: #fff;
+        color: #dc2626;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-align: left;
+
+        &:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #b91c1c;
+        }
+    }
+}
+
+/* Quarter komponenti uchun uslublar */
+.quarter {
+    padding: 20px;
+    // margin-left: 300px;
+    /* Sidebar kengligiga moslash */
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .error-message {
+        color: #dc2626;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 16px;
+
+        button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #1d4ed8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+
+            &:hover {
+                background-color: #1e40af;
+            }
+        }
+    }
+
+    .employee-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-family: 'Roboto', sans-serif;
+
+        th,
+        td {
+            border: 1px solid #d1d5db;
+            padding: 12px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .image-cell {
+            text-align: center;
+            width: 120px;
+        }
+
+        .employee-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-image {
+            color: #888;
+            font-style: italic;
+        }
+    }
+}

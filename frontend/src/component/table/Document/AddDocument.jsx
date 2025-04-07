@@ -1,16 +1,42 @@
-import React, { useState } from "react";
-import { Button, message, Upload, Progress } from "antd";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Button, Upload, Progress } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import axios from "axios"; // Axios qo'shildi
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+// import { uploadDocuments, resetUploadState } from "../redux/slices/employeeSlice";
+import { uploadDocuments, resetUploadState } from "../../../redux/slices/employeeSlice";
 
 const AddDocument = ({ employeeId, onSuccess }) => {
+  const dispatch = useDispatch();
+  const { uploadStatus, uploadError, uploadProgress } = useSelector(
+    (state) => state.employees
+  );
+  const { isDarkMode } = useSelector((state) => state.theme);
   const [files, setFiles] = useState({
     cv: null,
     photo: null,
     passport: null,
     diplom: null,
   });
-  const [uploadProgress, setUploadProgress] = useState(0); // Progress bar uchun
+
+  useEffect(() => {
+    if (uploadStatus === "succeeded") {
+      toast.success("✅ Hujjatlar muvaffaqiyatli yuklandi!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      setFiles({ cv: null, photo: null, passport: null, diplom: null }); // Fayllarni tozalash
+      dispatch(resetUploadState()); // Redux state’ni tozalash
+      onSuccess();
+    } else if (uploadStatus === "failed" && uploadError) {
+      toast.error(`❌ Xatolik: ${uploadError}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      dispatch(resetUploadState());
+    }
+  }, [uploadStatus, uploadError, dispatch, onSuccess]);
 
   const handleFileChange = (info, field) => {
     if (info.file.status === "removed") {
@@ -29,66 +55,37 @@ const AddDocument = ({ employeeId, onSuccess }) => {
       formData.append("names", name)
     );
 
-    const token = localStorage.getItem("token"); // Tokenni olish
-    if (!token) {
-      message.error("Tizimga kiring!");
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `http://localhost:5000/api/employees/${employeeId}/documents`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`, // Token qo'shildi
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setUploadProgress(percentCompleted); // Progressni yangilash
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        message.success("✅ Hujjatlar muvaffaqiyatli yuklandi!");
-        setUploadProgress(0); // Yuklash tugagach progressni 0 ga qaytarish
-        onSuccess();
-      } else {
-        throw new Error("Server xatosi");
-      }
-    } catch (error) {
-      console.error("Xatolik:", error.response?.data || error.message);
-      message.error(
-        `❌ Server bilan bog'lanishda xatolik: ${
-          error.response?.data?.error || error.message
-        }`
-      );
-    }
+    dispatch(uploadDocuments({ employeeId, formData }));
   };
 
   const beforeUpload = (file) => {
-    const isValidType = ["application/pdf", "image/jpeg", "image/png"].includes(
-      file.type
-    );
+    const isValidType = ["application/pdf", "image/jpeg", "image/png"].includes(file.type);
     if (!isValidType) {
-      message.error("Faqat PDF, JPEG yoki PNG fayllarini yuklashingiz mumkin!");
+      toast.error("Faqat PDF, JPEG yoki PNG fayllarini yuklashingiz mumkin!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return false;
     }
     const isLt2M = file.size / 1024 / 1024 < 2; // 2MB dan kichik bo'lishi kerak
     if (!isLt2M) {
-      message.error("Fayl hajmi 2MB dan kichik bo'lishi kerak!");
+      toast.error("Fayl hajmi 2MB dan kichik bo'lishi kerak!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return false;
     }
     return false; // Ant Design uploadni avtomatik boshlashni oldini oladi
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+    <div
+      className={`p-5 rounded-lg shadow-md ${
+        isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+      }`}
+    >
+      <ToastContainer />
+      <div className="flex flex-col gap-4">
         <Upload
           name="cv"
           beforeUpload={beforeUpload}
@@ -97,7 +94,12 @@ const AddDocument = ({ employeeId, onSuccess }) => {
           showUploadList
           fileList={files.cv ? [files.cv] : []}
         >
-          <Button icon={<UploadOutlined />}>CV (.pdf)</Button>
+          <Button
+            icon={<UploadOutlined />}
+            className="flex items-center justify-center w-full p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            CV (.pdf)
+          </Button>
         </Upload>
         <Upload
           name="photo"
@@ -107,7 +109,12 @@ const AddDocument = ({ employeeId, onSuccess }) => {
           showUploadList
           fileList={files.photo ? [files.photo] : []}
         >
-          <Button icon={<UploadOutlined />}>Rasm (image)</Button>
+          <Button
+            icon={<UploadOutlined />}
+            className="flex items-center justify-center w-full p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            Rasm (image)
+          </Button>
         </Upload>
         <Upload
           name="passport"
@@ -117,7 +124,12 @@ const AddDocument = ({ employeeId, onSuccess }) => {
           showUploadList
           fileList={files.passport ? [files.passport] : []}
         >
-          <Button icon={<UploadOutlined />}>Pasport (.pdf)</Button>
+          <Button
+            icon={<UploadOutlined />}
+            className="flex items-center justify-center w-full p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            Pasport (.pdf)
+          </Button>
         </Upload>
         <Upload
           name="diplom"
@@ -127,19 +139,27 @@ const AddDocument = ({ employeeId, onSuccess }) => {
           showUploadList
           fileList={files.diplom ? [files.diplom] : []}
         >
-          <Button icon={<UploadOutlined />}>Diplom (.pdf)</Button>
+          <Button
+            icon={<UploadOutlined />}
+            className="flex items-center justify-center w-full p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            Diplom (.pdf)
+          </Button>
         </Upload>
       </div>
       {uploadProgress > 0 && (
-        <Progress percent={uploadProgress} style={{ marginTop: "15px" }} />
+        <Progress percent={uploadProgress} className="mt-4" />
       )}
       <Button
-        type="primary"
         onClick={handleUpload}
-        style={{ marginTop: "20px", width: "100%" }}
-        disabled={Object.values(files).every((file) => !file)}
+        disabled={Object.values(files).every((file) => !file) || uploadStatus === "loading"}
+        className={`mt-5 w-full p-2 rounded-md text-white ${
+          uploadStatus === "loading"
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-blue-500 hover:bg-blue-600"
+        }`}
       >
-        Yuklash
+        {uploadStatus === "loading" ? "Yuklanmoqda..." : "Yuklash"}
       </Button>
     </div>
   );
