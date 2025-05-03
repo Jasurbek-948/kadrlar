@@ -28,8 +28,10 @@ export const loginUser = createAsyncThunk(
 // Foydalanuvchi logout qilish
 export const logoutUser = createAsyncThunk("auth/logoutUser", async (_, { rejectWithValue }) => {
   try {
+    console.log("Logout jarayoni boshlandi (authSlice)");
     return true;
   } catch (error) {
+    console.error("Logout xatosi (authSlice):", error);
     return rejectWithValue(error.message || "Logout jarayonida xatolik!");
   }
 });
@@ -56,7 +58,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login User
       .addCase(loginUser.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -71,7 +72,6 @@ const authSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      // Logout User
       .addCase(logoutUser.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -81,6 +81,7 @@ const authSlice = createSlice({
         state.token = null;
         state.isAuthenticated = false;
         localStorage.removeItem("token");
+        console.log("Logout muvaffaqiyatli yakunlandi (authSlice)");
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.status = "failed";

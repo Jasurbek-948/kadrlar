@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../../redux/slices/authSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faSignOutAlt, faBars, faUsers, faFileAlt, faCalendarAlt, faFileContract } from "@fortawesome/free-solid-svg-icons";
+import { ToastContainer, toast } from "react-toastify";
 
 const Header = ({ onLogout }) => {
   const navigate = useNavigate();
@@ -18,12 +19,18 @@ const Header = ({ onLogout }) => {
   };
 
   const handleLogout = () => {
-    dispatch(logoutUser()).then(() => {
-      if (onLogout) {
-        onLogout();
-      }
+  console.log("Logout jarayoni boshlandi (App)");
+  dispatch(logoutUser())
+    .then(() => {
+      console.log("Logout muvaffaqiyatli yakunlandi (App)");
+      // Toast'larni to'xtatish
+      ToastContainer.dismiss(); // Barcha faol toast'larni yopish
+      navigate("/login", { replace: true });
+    })
+    .catch((error) => {
+      console.error("Logout xatosi (App):", error);
     });
-  };
+};
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -86,7 +93,7 @@ const Header = ({ onLogout }) => {
         </button>
         <button
           onClick={() => handleNavigation("/yillik-hisobotlar")}
-          className={`w-full md:w-auto px-2 py-1 font-medium text-sm transition-colors duration-200 focus:outline-none border-b-2 ${location.pathname === "/choraklik-hisobotlar"
+          className={`w-full md:w-auto px-2 py-1 font-medium text-sm transition-colors duration-200 focus:outline-none border-b-2 ${location.pathname === "/yillik-hisobotlar"
             ? "border-primary text-primary"
             : "border-transparent text-gray-600 dark:text-gray-300 hover:border-primary hover:text-primary"
             }`}

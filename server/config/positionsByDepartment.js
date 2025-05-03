@@ -133,7 +133,7 @@ const positionsByDepartment = {
       { name: "Telemexanika va nazorat o'lchov asboblari va aloqa yetakchi muxadisi", max: 2 },
       { name: "Elektrostatik ishlash operatori", max: 1 },
       { name: "Elektron jixozlari va dastur taminoti bo'yicha muxandis", max: 2 },
-      { name: "2- toifali telemexanika va nazorat o'lchov asboblari aloka muxandisi", max: 1 },
+      { name: "2- toifali telemexanika va nazorat o'lchov asboblari aloqa muxandisi", max: 1 },
       { name: "2 toifali muxandis sesmolog", max: 1 },
       { name: "Aloqa telemexanika va KIA buyicha muxandis", max: 1 },
       { name: "1- toifali geodezist", max: 1 },

@@ -26,6 +26,17 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.log("401 xatosi aniqlandi, logout jarayoni boshlanmoqda");
+      localStorage.removeItem("token");
+      window.dispatchEvent(new Event("logout")); // Custom event
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Xodimlarni olish
 export const fetchEmployees = createAsyncThunk(
