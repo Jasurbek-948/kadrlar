@@ -30,96 +30,80 @@ import QuarterSidebar from "./component/quarter/QuarterSidebar";
 import Yearly from "./component/yearly/Yearly";
 import YearlySidebar from "./component/yearly/YearlySidebar";
 import Classifier from "./component/yearly/Classifier";
-
+import Analitika from "./component/yearly/analitika/Analitika";
+import Vocation from "./component/yearly/vocation/Vocation";
 const AppContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthenticated, token } = useSelector((state) => state.auth);
+  const token = localStorage.getItem('token');
+  const isAuthenticated = !!token;
   const { isDarkMode } = useSelector((state) => state.theme);
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [positionFilter, setPositionFilter] = useState('');
   const [activeMenu, setActiveMenu] = useState('milliy-tarkib');
   const [showedToast, setShowedToast] = useState(false);
 
+  // Handle authentication and navigation
   useEffect(() => {
-    console.log("Token:", token, "Path:", location.pathname);
-    let timeout;
-    if (!token && location.pathname !== "/login") {
-      timeout = setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 0);
-    } else if (token && location.pathname === "/login") {
-      timeout = setTimeout(() => {
-        navigate("/", { replace: true });
-      }, 0);
+    const storedToken = localStorage.getItem('token');
+    if (storedToken && !token) {
+      dispatch(loginUser({ token: storedToken }));
+    } else if (!storedToken && isAuthenticated) {
+      dispatch(logoutUser());
     }
-    return () => clearTimeout(timeout);
-  }, [token, location.pathname, navigate]);
 
+    if (!isAuthenticated && location.pathname !== "/login") {
+      navigate("/login", { replace: true });
+    } else if (isAuthenticated && location.pathname === "/login") {
+      navigate("/", { replace: true });
+    }
+  }, [dispatch, isAuthenticated, token, navigate]);
+
+  // Handle system dark mode preference
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e) => {
-      dispatch(setDarkMode(e.matches));
-    };
+    const handleChange = (e) => dispatch(setDarkMode(e.matches));
     mediaQuery.addEventListener("change", handleChange);
+    dispatch(setDarkMode(mediaQuery.matches));
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [dispatch]);
 
+  // Apply dark mode class
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", isDarkMode);
   }, [isDarkMode]);
 
+  // Show login prompt toast
   useEffect(() => {
-    const handleLogoutEvent = () => {
-      console.log("Interceptor orqali logout event qabul qilindi");
-      dispatch(logoutUser());
-      navigate("/login", { replace: true });
-    };
-    window.addEventListener("logout", handleLogoutEvent);
-    return () => window.removeEventListener("logout", handleLogoutEvent);
-  }, [dispatch, navigate]);
-
-  useEffect(() => {
-    if (!token && !showedToast && location.pathname === "/login") {
+    if (!isAuthenticated && !showedToast && location.pathname === "/login") {
       toast.info("Iltimos, qayta kirish qiling!", {
         onOpen: () => setShowedToast(true),
       });
     }
-  }, [token, location.pathname, showedToast]);
+  }, [isAuthenticated, location.pathname, showedToast]);
 
   const handleMenuChange = (menuId) => {
     setActiveMenu(menuId);
   };
 
   const handleLogin = (token) => {
+    localStorage.setItem('token', token);
     dispatch(loginUser({ token }));
   };
 
   const handleLogout = () => {
-    console.log("Logout jarayoni boshlandi (App)");
-    ToastContainer.dismiss(); // Barcha faol toast'larni yopish
-    dispatch(logoutUser())
-      .then(() => {
-        console.log("Logout muvaffaqiyatli yakunlandi (App)");
-        navigate("/login", { replace: true });
-      })
-      .catch((error) => {
-        console.error("Logout xatosi (App):", error);
-      });
+    dispatch(logoutUser());
+    navigate("/login", { replace: true });
   };
 
   const renderSidebar = () => {
     if (location.pathname === "/hisobot" || location.pathname === "/mexnat") {
       return <MonthlySidebar />;
-    } else if (location.pathname === '/choraklik-hisobotlar') {
+    } else if (location.pathname === '/choraklik-hisobotlar' || location.pathname === '/choraklik-hisobotlar/klassifikator' || location.pathname === '/choraklik-hisobotlar/analitika') {
       return <YearlySidebar activeMenu={activeMenu} onMenuChange={handleMenuChange} />;
-    } else if (location.pathname === '/choraklik-hisobotlar/klassifikator') {
-      return <YearlySidebar activeMenu={activeMenu} onMenuChange={handleMenuChange} />;
+    } else if (location.pathname === '/yillik-hisobotlar') {
+      return <QuarterSidebar />
     }
     return <Sidebar />;
   };
@@ -142,147 +126,90 @@ const AppContent = () => {
           <div className="flex flex-1">
             <div className="hidden lg:block">{renderSidebar()}</div>
             <main
-              className={`flex-1 p-4 sm:p-6 overflow-y-auto shadow-md rounded-lg m-2 sm:m-4 transition-colors duration-300 ${
-                isDarkMode ? "bg-gray-800" : "bg-white"
-              }`}
+              className={`flex-1 p-4 sm:p-6 overflow-y-auto shadow-md rounded-lg m-2 sm:m-4 transition-colors duration-300 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}
             >
               <Routes>
                 <Route
                   path="/"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Table />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><Table /></ProtectedRoute>}
                 />
                 <Route
                   path="/tatil"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <VacationTable />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><VacationTable /></ProtectedRoute>}
                 />
                 <Route
                   path="/xujjat"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Document />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><Document /></ProtectedRoute>}
                 />
                 <Route
                   path="/jazo"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Jazo />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><Jazo /></ProtectedRoute>}
                 />
                 <Route
                   path="/xujjat/AddDocument"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <AddDocument />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><AddDocument /></ProtectedRoute>}
                 />
                 <Route
                   path="/tabel"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Tabel />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><Tabel /></ProtectedRoute>}
                 />
                 <Route
                   path="/refer"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Refer />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><Refer /></ProtectedRoute>}
                 />
                 <Route
                   path="/archive"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Archive />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><Archive /></ProtectedRoute>}
                 />
                 <Route
                   path="/detail/:id"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <DetailPage />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><DetailPage /></ProtectedRoute>}
                 />
                 <Route
                   path="/edit/:id"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <EditPage />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><EditPage /></ProtectedRoute>}
                 />
                 <Route
                   path="/add-employee"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <AddEmployeePage />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><AddEmployeePage /></ProtectedRoute>}
                 />
                 <Route
                   path="/hisobot"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <MonthlyReports />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><MonthlyReports /></ProtectedRoute>}
                 />
                 <Route
                   path="/mexnat"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Mexnat />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}><Mexnat /></ProtectedRoute>}
                 />
                 <Route
                   path="/yillik-hisobotlar"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Quarter
-                        departmentFilter={departmentFilter}
-                        positionFilter={positionFilter}
-                      />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <Quarter departmentFilter={departmentFilter} positionFilter={positionFilter} />
+                  </ProtectedRoute>}
                 />
                 <Route
                   path="/choraklik-hisobotlar"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Yearly
-                        departmentFilter={departmentFilter}
-                        positionFilter={positionFilter}
-                      />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <Yearly departmentFilter={departmentFilter} positionFilter={positionFilter} />
+                  </ProtectedRoute>}
                 />
                 <Route
                   path="/choraklik-hisobotlar/klassifikator"
-                  element={
-                    <ProtectedRoute isAuthenticated={isAuthenticated}>
-                      <Classifier
-                        departmentFilter={departmentFilter}
-                        positionFilter={positionFilter}
-                      />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <Classifier departmentFilter={departmentFilter} positionFilter={positionFilter} />
+                  </ProtectedRoute>}
+                />
+                <Route
+                  path="/choraklik-hisobotlar/analitika"
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <Analitika departmentFilter={departmentFilter} positionFilter={positionFilter} />
+                  </ProtectedRoute>}
+                />
+                <Route
+                  path="/choraklik-hisobotlar/vakansiya"
+                  element={<ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <Vocation />
+                  </ProtectedRoute>}
                 />
                 <Route
                   path="*"

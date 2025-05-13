@@ -1,0 +1,30 @@
+.adaptive-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: auto;
+
+    th {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+        background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    th,
+    td {
+        white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+
+        th,
+        td {
+            font-size: 14px;
+            padding: 6px;
+        }
+    }
+}

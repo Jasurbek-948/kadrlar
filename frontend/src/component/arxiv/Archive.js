@@ -5,7 +5,7 @@ import moment from "moment";
 import "./Archive.css"; // Yangi CSS faylni import qilamiz
 
 const { Title, Text } = Typography;
-
+// 
 const Archive = () => {
   const [archivedData, setArchivedData] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,113 +1,160 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './quarter.scss';
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCalendar,
+  faGift,
+  faMapMarkerAlt,
+  faCreditCard,
+  faTags,
+  faUserFriends,
+  faHeadset,
+  faSun,
+  faMoon,
+} from "@fortawesome/free-solid-svg-icons";
+import { Link, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../../redux/slices/themeSlice";
 
-const QuarterSidebar = ({ setDepartmentFilter, setPositionFilter }) => {
-    const departments = [
-        { label: "Boshqaruv", value: "Boshqaruv" },
-        { label: "AKT bo'limi", value: "AKTni joriy etish va axborot xavfsizligi bo'limi" },
-    ];
 
-    const positions = [
-        {
-            label: "«Andijon GES» filiali direktori lavozimiga zaxiraga kiritilgan nomzodlar ro’yxati",
-            value: "Direktor"
-        },
-        {
-            label: "«Andijon GES» filiali bosh muhandisi zaxirasiga kiritilgan nomzodlar ro’yxati",
-            value: "Bosh muhandis"
-        },
-        {
-            label: "«Andijon GES» filiali direktori o’rinbosari (Suv omborlarini xavfsiz eksplutatsiyasi va raqamlashtirish bo'yicha) lavozimiga zaxiraga kiritilgan nomzodlar ro’yxati",
-            value: "Direktor o'rinbosari"
-        },
-        {
-            label: "«Andijon GES» filiali bosh xisobchisi zaxirasiga kiritilgan nomzodlar ro’yxati",
-            value: "Bosh xisobchi"
-        },
-    ];
-
-    const handleDepartmentFilter = (value) => {
-        if (setDepartmentFilter) {
-            setDepartmentFilter(value);
-            localStorage.setItem('departmentFilter', value);
-        } else {
-            console.error('setDepartmentFilter funksiyasi mavjud emas');
-        }
-    };
-
-    const handlePositionFilter = (value) => {
-        if (setPositionFilter) {
-            setPositionFilter(value);
-            localStorage.setItem('positionFilter', value);
-        } else {
-            console.error('setPositionFilter funksiyasi mavjud emas');
-        }
-    };
-
-    const clearFilters = () => {
-        if (setDepartmentFilter && setPositionFilter) {
-            setDepartmentFilter('');
-            setPositionFilter('');
-            localStorage.removeItem('departmentFilter');
-            localStorage.removeItem('positionFilter');
-        } else {
-            console.error('setDepartmentFilter yoki setPositionFilter funksiyasi mavjud emas');
-        }
-    };
-
-    return (
-        <div className="sidebar">
-            <div className="filter-section">
-                <h4>Bo'lim bo'yicha filtr</h4>
-                <div className="filter-buttons">
-                    {departments.map((dept) => (
-                        <button
-                            key={dept.value}
-                            className={`filter-btn ${dept.value === (localStorage.getItem('departmentFilter') || '') ? 'active' : ''}`}
-                            onClick={() => {
-                                handleDepartmentFilter(dept.value);
-                                localStorage.setItem('departmentFilter', dept.value);
-                            }}
-                        >
-                            {dept.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="filter-section">
-                <h4>Lavozim bo'yicha filtr</h4>
-                <div className="filter-buttons">
-                    {positions.map((pos) => (
-                        <button
-                            key={pos.value}
-                            className={`filter-btn ${pos.value === (localStorage.getItem('positionFilter') || '') ? 'active' : ''}`}
-                            onClick={() => {
-                                handlePositionFilter(pos.value);
-                                localStorage.setItem('positionFilter', pos.value);
-                            }}
-                        >
-                            {pos.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="filter-section">
+const QuarterSidebar = () => {
+     const location = useLocation();
+      const dispatch = useDispatch();
+      const { isDarkMode } = useSelector((state) => state.theme);
+    
+      const handleToggleTheme = () => {
+        dispatch(toggleTheme());
+      };
+  return (
+     <div
+          className={`w-64 h-screen p-4 shadow-lg transition-colors duration-300 ${isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+            }`}
+        >
+          <nav className="menu">
+            <ul className="space-y-2">
+              <li
+                className={`rounded-md transition-colors duration-200 ${location.pathname === "/choraklik-hisobotlar"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-200 text-gray-900"
+                  : isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-200"
+                  }`}
+              >
+                <Link to="/yillik-hisobotlar" className="flex items-center p-2">
+                  <FontAwesomeIcon className="mr-3 text-lg" icon={faCalendar} />
+                  <span>Zaxira kadrlar</span>
+                </Link>
+              </li>
+              <li
+                className={`rounded-md transition-colors duration-200 ${location.pathname === "/choraklik-hisobotlar/klassifikator"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-200 text-gray-900"
+                  : isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-200"
+                  }`}
+              >
+                <Link to="/yillik-hisobotlar" className="flex items-center p-2">
+                  <FontAwesomeIcon className="mr-3 text-lg" icon={faGift} />
+                  <span>-------</span>
+                </Link>
+              </li>
+              <li
+                className={`rounded-md transition-colors duration-200 ${location.pathname === "/refer"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-200 text-gray-900"
+                  : isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-200"
+                  }`}
+              >
+                <Link to="/yillik-hisobotlar" className="flex items-center p-2">
+                  <FontAwesomeIcon className="mr-3 text-lg" icon={faUserFriends} />
+                  <span>------</span>
+                </Link>
+              </li>
+              {/* <li
+                className={`rounded-md transition-colors duration-200 ${location.pathname === "/jazo"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-200 text-gray-900"
+                  : isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-200"
+                  }`}
+              >
+                <Link to="/jazo" className="flex items-center p-2">
+                  <FontAwesomeIcon className="mr-3 text-lg" icon={faMapMarkerAlt} />
+                  <span>Intizomiy jazolar</span>
+                </Link>
+              </li> */}
+              {/* <li
+                className={`rounded-md transition-colors duration-200 ${location.pathname === "/xujjat"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-200 text-gray-900"
+                  : isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-200"
+                  }`}
+              >
+                <Link to="/xujjat" className="flex items-center p-2">
+                  <FontAwesomeIcon className="mr-3 text-lg" icon={faCreditCard} />
+                  <span>Qo'shimcha xujjatlar</span>
+                </Link>
+              </li> */}
+              {/* <li
+                className={`rounded-md transition-colors duration-200 ${location.pathname === "/tabel"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-200 text-gray-900"
+                  : isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-200"
+                  }`}
+              >
+                <Link to="/tabel" className="flex items-center p-2">
+                  <FontAwesomeIcon className="mr-3 text-lg" icon={faTags} />
+                  <span>Tabel</span>
+                </Link>
+              </li> */}
+             
+              {/* <li
+                className={`rounded-md transition-colors duration-200 ${location.pathname === "/archive"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-200 text-gray-900"
+                  : isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-200"
+                  }`}
+              >
+                <Link to="/archive" className="flex items-center p-2">
+                  <FontAwesomeIcon className="mr-3 text-lg" icon={faHeadset} />
+                  <span>Arxiv</span>
+                </Link>
+              </li> */}
+              {/* Tema o‘zgartirish tugmasi */}
+              {/* <li className="mt-4">
                 <button
-                    className="clear-btn"
-                    onClick={() => {
-                        clearFilters();
-                        localStorage.removeItem('departmentFilter');
-                        localStorage.removeItem('positionFilter');
-                    }}
+                  onClick={handleToggleTheme}
+                  className={`flex items-center p-2 w-full rounded-md transition-colors duration-200 ${isDarkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"
+                    }`}
                 >
-                    Filtrlarni tozalash
+                  <FontAwesomeIcon
+                    className="mr-3 text-lg"
+                    icon={isDarkMode ? faSun : faMoon}
+                  />
+                  <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
                 </button>
-            </div>
+              </li> */}
+            </ul>
+          </nav>
         </div>
-    );
+  );
 };
 
-export default QuarterSidebar;
+export default QuarterSidebar; // Default eksport

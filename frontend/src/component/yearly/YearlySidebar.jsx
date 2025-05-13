@@ -62,6 +62,21 @@ const MonthlySidebar = () => {
                 </Link>
               </li>
               <li
+                className={`rounded-md transition-colors duration-200 ${location.pathname === "/refer"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-gray-200 text-gray-900"
+                  : isDarkMode
+                    ? "hover:bg-gray-700"
+                    : "hover:bg-gray-200"
+                  }`}
+              >
+                <Link to="/choraklik-hisobotlar/analitika" className="flex items-center p-2">
+                  <FontAwesomeIcon className="mr-3 text-lg" icon={faUserFriends} />
+                  <span>Analitika</span>
+                </Link>
+              </li>
+              {/* <li
                 className={`rounded-md transition-colors duration-200 ${location.pathname === "/jazo"
                   ? isDarkMode
                     ? "bg-gray-700 text-white"
@@ -75,8 +90,8 @@ const MonthlySidebar = () => {
                   <FontAwesomeIcon className="mr-3 text-lg" icon={faMapMarkerAlt} />
                   <span>Intizomiy jazolar</span>
                 </Link>
-              </li>
-              <li
+              </li> */}
+              {/* <li
                 className={`rounded-md transition-colors duration-200 ${location.pathname === "/xujjat"
                   ? isDarkMode
                     ? "bg-gray-700 text-white"
@@ -90,8 +105,8 @@ const MonthlySidebar = () => {
                   <FontAwesomeIcon className="mr-3 text-lg" icon={faCreditCard} />
                   <span>Qo'shimcha xujjatlar</span>
                 </Link>
-              </li>
-              <li
+              </li> */}
+              {/* <li
                 className={`rounded-md transition-colors duration-200 ${location.pathname === "/tabel"
                   ? isDarkMode
                     ? "bg-gray-700 text-white"
@@ -105,23 +120,9 @@ const MonthlySidebar = () => {
                   <FontAwesomeIcon className="mr-3 text-lg" icon={faTags} />
                   <span>Tabel</span>
                 </Link>
-              </li>
-              <li
-                className={`rounded-md transition-colors duration-200 ${location.pathname === "/refer"
-                  ? isDarkMode
-                    ? "bg-gray-700 text-white"
-                    : "bg-gray-200 text-gray-900"
-                  : isDarkMode
-                    ? "hover:bg-gray-700"
-                    : "hover:bg-gray-200"
-                  }`}
-              >
-                <Link to="/refer" className="flex items-center p-2">
-                  <FontAwesomeIcon className="mr-3 text-lg" icon={faUserFriends} />
-                  <span>--------</span>
-                </Link>
-              </li>
-              <li
+              </li> */}
+             
+              {/* <li
                 className={`rounded-md transition-colors duration-200 ${location.pathname === "/archive"
                   ? isDarkMode
                     ? "bg-gray-700 text-white"
@@ -135,9 +136,9 @@ const MonthlySidebar = () => {
                   <FontAwesomeIcon className="mr-3 text-lg" icon={faHeadset} />
                   <span>Arxiv</span>
                 </Link>
-              </li>
+              </li> */}
               {/* Tema o‘zgartirish tugmasi */}
-              <li className="mt-4">
+              {/* <li className="mt-4">
                 <button
                   onClick={handleToggleTheme}
                   className={`flex items-center p-2 w-full rounded-md transition-colors duration-200 ${isDarkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"
@@ -149,7 +150,7 @@ const MonthlySidebar = () => {
                   />
                   <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
                 </button>
-              </li>
+              </li> */}
             </ul>
           </nav>
         </div>

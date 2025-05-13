@@ -1,5 +1,5 @@
 import React from "react";
-
+import "./MonthlyReports.css"
 
 const MonthlySidebar = () => {
   return (
